@@ -1,3 +1,12 @@
+#Ignore all
+*
+# but these
+!smartio/
+!test/
+!LICENSE
+!.gitignore
+!README
+
 # Compiled Object files
 *.slo
 *.lo
