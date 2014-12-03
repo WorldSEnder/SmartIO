@@ -4,10 +4,7 @@
  *  Created on: 27.11.2014
  *      Author: Carbon
  */
-
 #pragma once
-#ifndef SUPPLIER_HPP_
-#define SUPPLIER_HPP_
 
 #include <istream>
 
@@ -58,6 +55,4 @@ public:
 	}
 };
 
-}
-
-#endif /* SUPPLIER_HPP_ */
+} /* namespace io */

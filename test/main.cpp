@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cstdint>
 #include <list>
+#include <memory>
 
 #include "smartio/Environment.hpp"
 #include "smartio/Reader.hpp"
@@ -25,11 +26,11 @@ typedef struct {
 	uint16_t matFlag;
 } headerBlock_t;
 
-const io::utility::aggregate_supplier<
+using HeaderSupplier = io::utility::aggregate_supplier<
 		headerBlock_t,
 		uint32_t,
 		uint16_t,
-		uint16_t> headerSupplier;
+		uint16_t>;
 
 typedef struct {
 public:
@@ -60,7 +61,7 @@ class IndexBlockSupplier : public io::Supplier<indexBlock_t> {
 	indexBlock_t supply(io::Context& ctx) const override {
 		indexBlock_t target;
 		unsigned int nbr = ctx.getValue(INDEX_NBR_KEY, 0);
-		for(; nbr > 0; --nbr) {
+		while(nbr --> 0) {
 			target.indices.push_back(ctx.construct<uint16_t>());
 		}
 		return target;
@@ -97,7 +98,7 @@ class VertexBlockSupplier : public io::Supplier<vertexBlock_t> {
 	vertexBlock_t supply(io::Context& ctx) const override {
 		vertexBlock_t target;
 		unsigned int nbr = ctx.getValue(VERTEX_NBR_KEY, 0);
-		for(; nbr > 0; --nbr) {
+		while(nbr --> 0) {
 			target.vertices.push_back(ctx.construct<vertex_t>());
 		}
 		return target;
@@ -137,45 +138,49 @@ class FileSupplier : public io::Supplier<sknFile_t> {
 				trgt.nbrMats = ctx.construct<uint32_t>()
 				:
 				trgt.nbrMats = 0;
-		for(; c; --c) {
+		while (c --> 0) {
 			trgt.materials.push_back(ctx.construct<materialBlock_t>());
 		}
 		c = trgt.header.nbrObjects;
-		for(; c; --c) {
+		while (c --> 0) {
 			trgt.objects.push_back(ctx.construct<objectBlock_t>());
 		}
 		return trgt;
 	}
-} const fileSupplier;
+};
 
 using io::Environment;
 using io::Reader;
 using std::ifstream;
+
 int main(void) {
 	Environment env;
 	// Add suppliers
-	env.addSupplier(fileSupplier);
-	env.addSupplier(headerSupplier);
-	env.addSupplier(materialBlockSupplier);
-	env.addSupplier(objectBlockSupplier);
-	env.addSupplier(indexBlockSuppler);
-	env.addSupplier(vertexBlockSupplier);
-	env.addSupplier(vertexSupplier);
+	env.addDefaultConstructibeSupplier<FileSupplier>();
+	env.addDefaultConstructibeSupplier<HeaderSupplier>();
+	env.addDefaultConstructibeSupplier<MaterialBlockSupplier>();
+	env.addDefaultConstructibeSupplier<ObjectBlockSupplier>();
+	env.addDefaultConstructibeSupplier<IndexBlockSupplier>();
+	env.addDefaultConstructibeSupplier<VertexBlockSupplier>();
+	env.addDefaultConstructibeSupplier<VertexSupplier>();
 	// Build the Reader
 	Reader read = env.build();
 	// Open the file
 	ifstream file;
-	file.open ("C:\\tmp\\somefilename.txt");
+	file.open (R"wpykn(C:\Users\Carbon\Documents\CreativeWorkspace\LoLBearbeitung\data\characters\ahri\skins\base\ahri.skn)wpykn", std::ios::in | std::ios::binary);
 	if(!file) {
 		std::cout << "Couldn't open file. Exiting." << std::endl;
 		return -1;
 	}
 	// And read the objects
+	const io::Supplier<sknFile_t>& supplier = read.getSupplier<sknFile_t>();
 	try {
-		sknFile_t sknData = read.construct<sknFile_t>(file);
-		std::cout << sknData.header.magicNbr;
+		io::Context context = read.createContext(file);
+		// sknFile_t sknData = read.construct<sknFile_t>(file);
+		sknFile_t sknData = supplier.supply(context);
+		std::cout << sknData.objects.front().vertices.vertices.back().texCoords[1];
 	} catch (std::invalid_argument& e) {
-		std::cout << "No supplier for requested Type found" << std::endl;
+		std::cout << e.what() << std::endl;
 		return -1;
 	} catch (io::fileformatexception& e) {
 		std::cout << "Unexpected eof!" << std::endl;

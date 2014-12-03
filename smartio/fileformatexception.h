@@ -4,10 +4,7 @@
  *  Created on: 29.11.2014
  *      Author: Carbon
  */
-
 #pragma once
-#ifndef FILEFORMATEXCEPTION_H_
-#define FILEFORMATEXCEPTION_H_
 
 #include <sstream>
 #include <stdexcept>
@@ -29,5 +26,3 @@ public:
 };
 
 } /* namespace io */
-
-#endif /* FILEFORMATEXCEPTION_H_ */

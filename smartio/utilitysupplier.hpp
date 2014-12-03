@@ -4,10 +4,7 @@
  *  Created on: 29.11.2014
  *      Author: Carbon
  */
-
 #pragma once
-#ifndef UTILITYSUPPLIER_HPP_
-#define UTILITYSUPPLIER_HPP_
 
 #include <array>
 
@@ -72,5 +69,3 @@ struct array_supplier : Supplier<std::array<T, N>> {
 
 } /* namespace utility */
 } /* namespace io */
-
-#endif /* UTILITYSUPPLIER_HPP_ */

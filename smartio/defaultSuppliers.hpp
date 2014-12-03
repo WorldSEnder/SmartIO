@@ -6,8 +6,6 @@
  */
 
 #pragma once
-#ifndef DEFAULTSUPPLIERS_HPP_
-#define DEFAULTSUPPLIERS_HPP_
 
 #include <stdint.h>
 
@@ -72,5 +70,3 @@ EXTERNSUPPLIER(uint64_t)
 #pragma pop_macro("EXTERNSUPPLIER")
 } /* namespace defaultsuppliers */
 } /* namespace io */
-
-#endif /* DEFAULTSUPPLIERS_HPP_ */

@@ -8,6 +8,8 @@
 #include "defaultSuppliers.hpp"
 #include "fileformatexception.h"
 
+#include <iostream>
+
 namespace io
 {
 namespace defaultsuppliers
@@ -20,9 +22,9 @@ auto stdsupplier_t<T>::supply(Context& context) const
 		-> typename stdsupplier_t<T>::item_t {
 	istream& is = context.getStream();
 	is.read(this->converter.buffer, item_size);
-	if(!is)
-		// TODO: more information pls, also this is too early
-		throw fileformatexception("Couldn't read stdtype");
+	if(is.fail())
+		// TODO: add more information here
+		throw fileformatexception("Unexpected eof. Couldn't fully read std-type");
 	return this->converter.item;
 }
 

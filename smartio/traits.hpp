@@ -4,10 +4,7 @@
  *  Created on: 27.11.2014
  *      Author: Carbon
  */
-
 #pragma once
-#ifndef TRAITS_HPP_
-#define TRAITS_HPP_
 
 #include <functional>
 #include <array>
@@ -48,6 +45,9 @@ struct supply_t<T[N], f> {
 	typedef typename supply_t<T>::type ele_t;
 };
 
-}
+template<template<typename> class Base, typename T>
+static T __base_deduction(const Base<T> &);
+template<template<typename> class Base, class Q>
+using base_deduction = decltype(__base_deduction<Base>(std::declval<Q>()));
 
-#endif /* TRAITS_HPP_ */
+} /* namespace io */

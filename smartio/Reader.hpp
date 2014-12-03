@@ -4,14 +4,11 @@
  *  Created on: 27.11.2014
  *      Author: Carbon
  */
-
 #pragma once
-#ifndef READER_H_
-#define READER_H_
 
 #include <unordered_map>
 #include <stdexcept>
-#include <functional>
+#include <memory>
 #include <istream>
 
 #include "traits.hpp"
@@ -24,7 +21,7 @@ namespace io
 using std::unordered_map;
 using std::istream;
 using std::invalid_argument;
-using std::reference_wrapper;
+using std::shared_ptr;
 
 using typetoken::token_t;
 /**
@@ -36,7 +33,7 @@ using typetoken::token_t;
  */
 class Reader
 {
-	using supplier_map = unordered_map<token_t, reference_wrapper<const SupplierBase>>;
+	using supplier_map = unordered_map<token_t, shared_ptr<const SupplierBase>>;
 private:
 	Reader(void);
 	const supplier_map suppliers;
@@ -56,6 +53,7 @@ public:
 	 */
 	template<typename T>
 	const Supplier<T>& getSupplier() const {
+		// TODO: add an option to select different reading modes, BINARY, TEXT, etc.
 		using item_t = typename supply_t<T>::type;
 		using supplier_t = Supplier<item_t>;
 		// Get the registered supplier
@@ -65,7 +63,7 @@ public:
 		if(it == suppliers.end())
 			throw invalid_argument("No supplier registered for given type.");
 		// Reinterpret to actual type and get item
-		const supplier_t& supp = *reinterpret_cast<const supplier_t*>(&(it->second.get()));
+		const supplier_t& supp = *std::static_pointer_cast<const Supplier<T>, const SupplierBase>(it->second);
 		return supp;
 	}
 	Context createContext(istream& stream) const {
@@ -93,5 +91,3 @@ public:
 };
 
 } /* namespace io */
-
-#endif /* READER_H_ */

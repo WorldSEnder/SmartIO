@@ -10,8 +10,8 @@
 namespace io
 {
 
-Context::Context(const supplier_map& reader, istream& stream)
-	: reference(reader), stream(stream) {}
+Context::Context(const supplier_map reader, istream& stream)
+	: reference(std::move(reader)), stream(stream) {}
 
 Context::~Context() {}
 
@@ -27,7 +27,7 @@ Context::setValue(key_t key, value_t val) {
 
 Context::value_t
 Context::getValue(key_t key, value_t defaultVal) {
-	const auto& it = contextVars.find(key);
+	auto&& it = contextVars.find(key);
 	if(it == contextVars.end())
 		return defaultVal;
 	return it->second;
@@ -35,10 +35,7 @@ Context::getValue(key_t key, value_t defaultVal) {
 
 bool
 Context::hasValue(key_t key) {
-	const auto& it = contextVars.find(key);
-	if(it == contextVars.end())
-		return false;
-	return true;
+	return contextVars.find(key) != contextVars.end();
 }
 
 } /* namespace io */

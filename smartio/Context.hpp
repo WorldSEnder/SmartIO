@@ -6,12 +6,10 @@
  */
 
 #pragma once
-#ifndef CONTEXT_HPP_
-#define CONTEXT_HPP_
 
 #include <unordered_map>
 #include <stdexcept>
-#include <functional>
+#include <memory>
 #include <istream>
 
 #include "typetoken.hpp"
@@ -23,41 +21,12 @@ namespace io
 using std::unordered_map;
 using std::istream;
 using std::invalid_argument;
-using std::reference_wrapper;
+using std::shared_ptr;
 
 using typetoken::token_t;
 
 // Forward declare for friend
 class Reader;
-class Context;
-namespace {
-	template<typename T>
-	struct ReadingHelper {
-		using item_t = typename supply_t<T>::type;
-		static item_t
-		supply(const Supplier<item_t>& suppl, Context& ctx) {
-			return suppl.supply(ctx);
-		}
-	};
-
-	template<typename T, std::size_t N>
-	struct ReadingHelper<T[N]> {
-		using ele_t = typename supply_t<T[N]>::ele_t;
-		using arr_t = std::array<T, N>;
-		using iterator_t = typename arr_t::iterator;
-		using item_t = typename supply_t<T[N]>::type;
-		static item_t
-		supply(const Supplier<ele_t>& suppl, Context& ctx) {
-			arr_t arr;
-			iterator_t it = arr.begin();
-			std::size_t c;
-			for(c = N; c; --c) {
-				*it = ReadingHelper<T>::supply(suppl, ctx);
-			}
-			return arr.data();
-		}
-	};
-}
 
 /**
  * Works as a temporary context for Suppliers and thus is dependent
@@ -70,13 +39,13 @@ namespace {
 class Context
 {
 	// Suppliers
-	using supplier_map = unordered_map<token_t, reference_wrapper<const SupplierBase>>;
+	using supplier_map = unordered_map<token_t, shared_ptr<const SupplierBase>>;
 	// Context variables
 	using key_t = unsigned int;
 	using value_t = signed int;
 	using var_map = unordered_map<key_t, value_t>;
 private:
-	const supplier_map& reference;
+	const supplier_map reference;
 	istream& stream;
 	var_map contextVars;
 	Context() = delete;
@@ -86,8 +55,7 @@ private:
 	 * sure that supplier_map contains actual suppliers when handed over by
 	 * user so we have to friend Reader for this
 	 */
-	Context(const supplier_map&, istream&);
-	Context(supplier_map&&, istream&) = delete;
+	Context(const supplier_map, istream&);
 	// Helper function to find supplier in map
 	template<typename T>
 	const Supplier<T>& retrieveSupplier() const {
@@ -100,7 +68,7 @@ private:
 		if(it == reference.end())
 			throw invalid_argument("No supplier registered for given type.");
 		// Reinterpret to actual type and get item
-		const supplier_t& supp = *reinterpret_cast<const supplier_t*>(&(it->second.get()));
+		const supplier_t& supp = *std::static_pointer_cast<const Supplier<T>, const SupplierBase>(it->second);
 		return supp;
 	}
 public:
@@ -130,10 +98,10 @@ public:
 	template<typename T>
 	typename supply_t<T>::type
 	construct() {
-		using item_t = typename supply_t<T>::ele_t;
+		using item_t = typename supply_t<T>::type;
 		using supplier_t = Supplier<item_t>;
 		const supplier_t& supp = this->retrieveSupplier<item_t>();
-		return ReadingHelper<T>::supply(supp, *this);
+		return supp.supply(*this);
 	}
 	/**
 	 * Returns the i-stream this Context is bound to. Altering the stream
@@ -159,5 +127,3 @@ public:
 };
 
 } /* namespace io */
-
-#endif /* CONTEXT_HPP_ */

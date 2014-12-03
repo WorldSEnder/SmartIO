@@ -4,10 +4,7 @@
  *  Created on: 27.11.2014
  *      Author: Carbon
  */
-
 #pragma once
-#ifndef TYPETOKEN_HPP_
-#define TYPETOKEN_HPP_
 
 #include <atomic>
 #include <typeinfo>
@@ -68,5 +65,3 @@ inline impl_token_t getImplToken(void) {
 }
 
 } // namespace typetoken
-
-#endif /* TYPETOKEN_HPP_ */
