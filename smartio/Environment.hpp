@@ -51,7 +51,6 @@ public:
 	 */
 	template<typename T, typename Q=base_deduction<Supplier, T>>
 	Environment& addSupplier(shared_ptr<T> supplier) {
-		static_assert(std::is_base_of<Supplier<Q>, T>::value, "T must extend Supplier<Q>");
 		using item_t = typename supply_t<Q>::type;
 		if(supplier == nullptr)
 			return *this;
