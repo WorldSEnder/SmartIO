@@ -38,6 +38,7 @@ public:
 
 template<typename T>
 class BoundSupplier {
+	// TODO: change this to std::shared_ptr, too?
 	const Supplier<T>& reference;
 	istream& stream;
 public:

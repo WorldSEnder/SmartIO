@@ -7,20 +7,17 @@
 #pragma once
 
 #include <unordered_map>
-#include <stdexcept>
 #include <memory>
 #include <istream>
 
-#include "traits.hpp"
+#include "Context.hpp"
 #include "Supplier.hpp"
 #include "typetoken.hpp"
-#include "Context.hpp"
 
 namespace io
 {
 using std::unordered_map;
 using std::istream;
-using std::invalid_argument;
 using std::shared_ptr;
 
 using typetoken::token_t;
@@ -52,20 +49,8 @@ public:
 	 * <T> the type that should be supplied
 	 */
 	template<typename T>
-	const Supplier<T>& getSupplier() const {
-		// TODO: add an option to select different reading modes, BINARY, TEXT, etc.
-		using item_t = typename supply_t<T>::type;
-		using supplier_t = Supplier<item_t>;
-		// Get the registered supplier
-		token_t token = typetoken::getToken<item_t>();
-		const auto& it = suppliers.find(token); // Iterator
-		// Check if it's there
-		if(it == suppliers.end())
-			throw invalid_argument("No supplier registered for given type.");
-		// Reinterpret to actual type and get item
-		const supplier_t& supp = *std::static_pointer_cast<const Supplier<T>, const SupplierBase>(it->second);
-		return supp;
-	}
+	const Supplier<T>& getSupplier() const;
+
 	Context createContext(istream& stream) const {
 		return Context(this->suppliers, stream);
 	}
@@ -83,11 +68,9 @@ public:
 	 * <T> the type of object to be created
 	 */
 	template<typename T>
-	typename supply_t<T>::type
-	construct(istream& f) const {
-		Context ctx = createContext(f);
-		return ctx.construct<T>();
-	}
+	T construct(istream& f) const;
 };
 
 } /* namespace io */
+
+#include "Reader.tpp"

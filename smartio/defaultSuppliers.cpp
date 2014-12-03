@@ -23,7 +23,6 @@ auto stdsupplier_t<T>::supply(Context& context) const
 	istream& is = context.getStream();
 	is.read(this->converter.buffer, item_size);
 	if(is.fail())
-		// TODO: add more information here
 		throw fileformatexception("Unexpected eof. Couldn't fully read std-type");
 	return this->converter.item;
 }

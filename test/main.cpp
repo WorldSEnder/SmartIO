@@ -156,13 +156,13 @@ using std::ifstream;
 int main(void) {
 	Environment env;
 	// Add suppliers
-	env.addDefaultConstructibeSupplier<FileSupplier>();
-	env.addDefaultConstructibeSupplier<HeaderSupplier>();
-	env.addDefaultConstructibeSupplier<MaterialBlockSupplier>();
-	env.addDefaultConstructibeSupplier<ObjectBlockSupplier>();
-	env.addDefaultConstructibeSupplier<IndexBlockSupplier>();
-	env.addDefaultConstructibeSupplier<VertexBlockSupplier>();
-	env.addDefaultConstructibeSupplier<VertexSupplier>();
+	env.addDefaultConstructibleSupplier<FileSupplier>();
+	env.addDefaultConstructibleSupplier<HeaderSupplier>();
+	env.addDefaultConstructibleSupplier<MaterialBlockSupplier>();
+	env.addDefaultConstructibleSupplier<ObjectBlockSupplier>();
+	env.addDefaultConstructibleSupplier<IndexBlockSupplier>();
+	env.addDefaultConstructibleSupplier<VertexBlockSupplier>();
+	env.addDefaultConstructibleSupplier<VertexSupplier>();
 	// Build the Reader
 	Reader read = env.build();
 	// Open the file

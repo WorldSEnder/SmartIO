@@ -8,19 +8,16 @@
 #pragma once
 
 #include <unordered_map>
-#include <stdexcept>
 #include <memory>
 #include <istream>
 
-#include "typetoken.hpp"
-#include "traits.hpp"
 #include "Supplier.hpp"
+#include "typetoken.hpp"
 
 namespace io
 {
 using std::unordered_map;
 using std::istream;
-using std::invalid_argument;
 using std::shared_ptr;
 
 using typetoken::token_t;
@@ -42,7 +39,7 @@ class Context
 	using supplier_map = unordered_map<token_t, shared_ptr<const SupplierBase>>;
 	// Context variables
 	using key_t = unsigned int;
-	using value_t = signed int;
+	using value_t = std::size_t;
 	using var_map = unordered_map<key_t, value_t>;
 private:
 	const supplier_map reference;
@@ -58,19 +55,7 @@ private:
 	Context(const supplier_map, istream&);
 	// Helper function to find supplier in map
 	template<typename T>
-	const Supplier<T>& retrieveSupplier() const {
-		using item_t = typename supply_t<T>::type;
-		using supplier_t = Supplier<item_t>;
-		// Get the registered supplier
-		token_t token = typetoken::getToken<item_t>();
-		const auto& it = reference.find(token); // Iterator
-		// Check if it's there
-		if(it == reference.end())
-			throw invalid_argument("No supplier registered for given type.");
-		// Reinterpret to actual type and get item
-		const supplier_t& supp = *std::static_pointer_cast<const Supplier<T>, const SupplierBase>(it->second);
-		return supp;
-	}
+	const Supplier<T>& retrieveSupplier() const;
 public:
 	virtual ~Context();
 	/**
@@ -81,10 +66,7 @@ public:
 	 * <T> the type that should be supplied
 	 */
 	template<typename T>
-	const BoundSupplier<T> getSupplier() const {
-		using item_t = typename supply_t<T>::type;
-		return BoundSupplier<item_t>(this->retrieveSupplier<T>(), stream);
-	}
+	const BoundSupplier<T> getSupplier() const;
 	/**
 	 * Constructs a new object from this context using the stream that was
 	 * supplied in the context's constructor. Altering the stream
@@ -96,13 +78,7 @@ public:
 	 * is returned and can be used to manipulate the data further.
 	 */
 	template<typename T>
-	typename supply_t<T>::type
-	construct() {
-		using item_t = typename supply_t<T>::type;
-		using supplier_t = Supplier<item_t>;
-		const supplier_t& supp = this->retrieveSupplier<item_t>();
-		return supp.supply(*this);
-	}
+	T construct();
 	/**
 	 * Returns the i-stream this Context is bound to. Altering the stream
 	 * effectively changes the context thus this method can't be called from
@@ -123,7 +99,9 @@ public:
 	 */
 	bool hasValue(key_t);
 
-	friend io::Reader;
+	friend io::Reader; // TODO: think over that again
 };
 
 } /* namespace io */
+
+#include "Context.tpp"

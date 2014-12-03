@@ -6,11 +6,12 @@
  */
 
 #include "Environment.hpp"
+#include "defaultSuppliers.hpp"
 
 namespace io
 {
 #pragma push_macro("ADDSUPPLIER")
-#define ADDSUPPLIER(type) this->addDefaultConstructibeSupplier<defaultsuppliers::type>()
+#define ADDSUPPLIER(type) this->addDefaultConstructibleSupplier<defaultsuppliers::type>()
 
 Environment::Environment()
 {

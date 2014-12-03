@@ -6,20 +6,16 @@
  */
 #pragma once
 
-#include <memory>
 #include <unordered_map>
 
-#include "typetoken.hpp"
 #include "Supplier.hpp"
 #include "Reader.hpp"
-#include "defaultSuppliers.hpp"
 #include "traits.hpp"
 
 namespace io
 {
 using std::unordered_map;
 using std::shared_ptr;
-using typetoken::token_t;
 /**
  * This class serves as a Builder for Readers
  */
@@ -38,9 +34,7 @@ public:
 	 * <Q> the type to register for
 	 */
 	template<typename T, typename Q=base_deduction<Supplier, T>>
-	Environment& addDefaultConstructibeSupplier() {
-		return addSupplier<T, Q>(shared_ptr<T>(new T));
-	}
+	Environment& addDefaultConstructibleSupplier();
 	/**
 	 * Adds a supplier to the collection of suppliers used by all Readers
 	 * built by this Environment. Registering a nullptr has no effect.<br>
@@ -50,17 +44,7 @@ public:
 	 * <Q> the type to register for
 	 */
 	template<typename T, typename Q=base_deduction<Supplier, T>>
-	Environment& addSupplier(shared_ptr<T> supplier) {
-		using item_t = typename supply_t<Q>::type;
-		if(supplier == nullptr)
-			return *this;
-		token_t token = typetoken::getToken<item_t>();
-		// We use this instead of map[key] = value because Supplier is abstract
-		suppliers.insert(
-				std::make_pair(token,
-						std::static_pointer_cast<const SupplierBase, T>(supplier)));
-		return *this;
-	}
+	Environment& addSupplier(shared_ptr<T> supplier);
 	/**
 	 * Builds a new Reader from all registered suppliers. The Reader will
 	 * be capable of building objects of all types previously registered in
@@ -79,3 +63,5 @@ public:
 };
 
 } /* namespace io */
+
+#include "Environment.tpp"
