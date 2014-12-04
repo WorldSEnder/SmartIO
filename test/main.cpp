@@ -51,7 +51,7 @@ class MaterialBlockSupplier : public io::Supplier<materialBlock_t> {
 		trgt.nbrIndices = ctx.construct<uint32_t>();
 		return trgt;
 	}
-} const materialBlockSupplier;
+};
 
 typedef struct {
 	std::list<uint16_t> indices;
@@ -66,7 +66,7 @@ class IndexBlockSupplier : public io::Supplier<indexBlock_t> {
 		}
 		return target;
 	}
-} const indexBlockSuppler;
+};
 
 typedef struct {
 	float pos[3];
@@ -88,7 +88,7 @@ class VertexSupplier : public io::Supplier<vertex_t> {
 			{ctx.construct<float>(), ctx.construct<float>()}
 		};
 	}
-} const vertexSupplier;
+};
 
 typedef struct {
 	std::list<vertex_t> vertices;
@@ -103,7 +103,7 @@ class VertexBlockSupplier : public io::Supplier<vertexBlock_t> {
 		}
 		return target;
 	}
-} const vertexBlockSupplier;
+};
 
 typedef struct {
 	uint32_t nbrIndices;
@@ -121,7 +121,7 @@ class ObjectBlockSupplier : public io::Supplier<objectBlock_t> {
 		trgt.vertices = ctx.construct<vertexBlock_t>();
 		return trgt;
 	}
-} const objectBlockSupplier;
+};
 
 typedef struct {
 	headerBlock_t header;
