@@ -11,32 +11,31 @@
 namespace io
 {
 #pragma push_macro("ADDSUPPLIER")
-#define ADDSUPPLIER(type) this->addDefaultConstructibleSupplier<defaultsuppliers::type>()
+#define ADDSUPPLIER(type) this->addDefaultConstructibleSupplier<defaultsuppliers::stdsupplier_t< type >>()
 
 Environment::Environment()
 {
-	ADDSUPPLIER(bsupplier_t);
-//	ADDSUPPLIER(csupplier_t);
-//	ADDSUPPLIER(ucsupplier_t);
-//	ADDSUPPLIER(ssupplier_t);
-//	ADDSUPPLIER(ussupplier_t);
-//	ADDSUPPLIER(isupplier_t);
-//	ADDSUPPLIER(uisupplier_t);
-//	ADDSUPPLIER(llsupplier_t);
-//	ADDSUPPLIER(ullsupplier_t);
+	// integral types
+	ADDSUPPLIER(bool);
+	ADDSUPPLIER(char);
+	ADDSUPPLIER(char16_t);
+	ADDSUPPLIER(char32_t);
+	ADDSUPPLIER(wchar_t);
 	// Floating point types
-	ADDSUPPLIER(floatsupplier_t);
-	ADDSUPPLIER(doublesupplier_t);
-	ADDSUPPLIER(ldoublesupplier_t);
+	ADDSUPPLIER(float);
+	ADDSUPPLIER(double);
+	ADDSUPPLIER(long double);
 	// Fixed size types
-	ADDSUPPLIER(i8supplier_t);
-	ADDSUPPLIER(ui8supplier_t);
-	ADDSUPPLIER(i16supplier_t);
-	ADDSUPPLIER(ui16supplier_t);
-	ADDSUPPLIER(i32supplier_t);
-	ADDSUPPLIER(ui32supplier_t);
-	ADDSUPPLIER(i64supplier_t);
-	ADDSUPPLIER(ui64supplier_t);
+	ADDSUPPLIER(signed char);
+	ADDSUPPLIER(unsigned char);
+	ADDSUPPLIER(short int);
+	ADDSUPPLIER(unsigned short int);
+	ADDSUPPLIER(int);
+	ADDSUPPLIER(unsigned int);
+	ADDSUPPLIER(long int);
+	ADDSUPPLIER(unsigned long int);
+	ADDSUPPLIER(long long int);
+	ADDSUPPLIER(unsigned long long int);
 }
 
 Environment::~Environment() {

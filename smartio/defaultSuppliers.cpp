@@ -4,11 +4,10 @@
  * Created on: 27.11.2014
  *   Author: Carbon
  */
+#include <istream>
 
 #include "defaultSuppliers.hpp"
 #include "fileformatexception.h"
-
-#include <iostream>
 
 namespace io
 {
@@ -29,29 +28,27 @@ auto stdsupplier_t<T>::supply(Context& context) const
 
 #pragma push_macro("DEFINESUPPLIER")
 #define DEFINESUPPLIER(type) template class stdsupplier_t< type >;
-// STD types
+// integral types
 DEFINESUPPLIER(bool)
-//DEFINESUPPLIER(char)
-//DEFINESUPPLIER(unsigned char)
-//DEFINESUPPLIER(short)
-//DEFINESUPPLIER(unsigned short)
-//DEFINESUPPLIER(int)
-//DEFINESUPPLIER(unsigned int)
-//DEFINESUPPLIER(long long int)
-//DEFINESUPPLIER(unsigned long long int)
+DEFINESUPPLIER(char)
+DEFINESUPPLIER(char16_t)
+DEFINESUPPLIER(char32_t)
+DEFINESUPPLIER(wchar_t)
 // Floating point types
 DEFINESUPPLIER(float)
 DEFINESUPPLIER(double)
 DEFINESUPPLIER(long double)
 // Fixed size types
-DEFINESUPPLIER(int8_t)
-DEFINESUPPLIER(uint8_t)
-DEFINESUPPLIER(int16_t)
-DEFINESUPPLIER(uint16_t)
-DEFINESUPPLIER(int32_t)
-DEFINESUPPLIER(uint32_t)
-DEFINESUPPLIER(int64_t)
-DEFINESUPPLIER(uint64_t)
+DEFINESUPPLIER(signed char)
+DEFINESUPPLIER(unsigned char)
+DEFINESUPPLIER(short int)
+DEFINESUPPLIER(unsigned short int)
+DEFINESUPPLIER(int)
+DEFINESUPPLIER(unsigned int)
+DEFINESUPPLIER(long int)
+DEFINESUPPLIER(unsigned long int)
+DEFINESUPPLIER(long long int)
+DEFINESUPPLIER(unsigned long long int)
 
 #pragma pop_macro("DEFINESUPPLIER")
 } /* namespace defaultsuppliers */

@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
 #include "Supplier.hpp"
 #include "Context.hpp"
 
@@ -35,36 +33,48 @@ public:
 #pragma push_macro("USINGSUPPLIER")
 #define USINGSUPPLIER(name, type) using name##supplier_t = stdsupplier_t< type >;
 
-// STD types
+// integral types
 USINGSUPPLIER(b, bool)
+USINGSUPPLIER(c, char)
+USINGSUPPLIER(c16, char16_t)
+USINGSUPPLIER(c32, char32_t)
+USINGSUPPLIER(wc, wchar_t)
 // Floating point types
 USINGSUPPLIER(float, float)
 USINGSUPPLIER(double, double)
 USINGSUPPLIER(ldouble, long double)
 // Fixed size types
-USINGSUPPLIER(i8, int8_t)
-USINGSUPPLIER(ui8, uint8_t)
-USINGSUPPLIER(i16, int16_t)
-USINGSUPPLIER(ui16, uint16_t)
-USINGSUPPLIER(i32, int32_t)
-USINGSUPPLIER(ui32, uint32_t)
-USINGSUPPLIER(i64, int64_t)
-USINGSUPPLIER(ui64, uint64_t)
-// STD types
+USINGSUPPLIER(sc, signed char)
+USINGSUPPLIER(uc, unsigned char)
+USINGSUPPLIER(h, short int)
+USINGSUPPLIER(uh, unsigned short int)
+USINGSUPPLIER(i, int)
+USINGSUPPLIER(ui, unsigned int)
+USINGSUPPLIER(l, long int)
+USINGSUPPLIER(ul, unsigned long int)
+USINGSUPPLIER(ll, long long int)
+USINGSUPPLIER(ull, unsigned long long int)
+// integral types
 EXTERNSUPPLIER(bool)
+EXTERNSUPPLIER(char)
+EXTERNSUPPLIER(char16_t)
+EXTERNSUPPLIER(char32_t)
+EXTERNSUPPLIER(wchar_t)
 // Floating point types
 EXTERNSUPPLIER(float)
 EXTERNSUPPLIER(double)
 EXTERNSUPPLIER(long double)
 // Fixed size types
-EXTERNSUPPLIER(int8_t)
-EXTERNSUPPLIER(uint8_t)
-EXTERNSUPPLIER(int16_t)
-EXTERNSUPPLIER(uint16_t)
-EXTERNSUPPLIER(int32_t)
-EXTERNSUPPLIER(uint32_t)
-EXTERNSUPPLIER(int64_t)
-EXTERNSUPPLIER(uint64_t)
+EXTERNSUPPLIER(signed char)
+EXTERNSUPPLIER(unsigned char)
+EXTERNSUPPLIER(short int)
+EXTERNSUPPLIER(unsigned short int)
+EXTERNSUPPLIER(int)
+EXTERNSUPPLIER(unsigned int)
+EXTERNSUPPLIER(long int)
+EXTERNSUPPLIER(unsigned long int)
+EXTERNSUPPLIER(long long int)
+EXTERNSUPPLIER(unsigned long long int)
 
 #pragma pop_macro("USINGSUPPLIER")
 #pragma pop_macro("EXTERNSUPPLIER")

@@ -156,15 +156,13 @@ using std::ifstream;
 int main(void) {
 	Environment env;
 	// Add suppliers
-	env.addDefaultConstructibleSupplier<FileSupplier>();
-	env.addDefaultConstructibleSupplier<HeaderSupplier>();
-	env.addDefaultConstructibleSupplier<MaterialBlockSupplier>();
-	env.addDefaultConstructibleSupplier<ObjectBlockSupplier>();
-	env.addDefaultConstructibleSupplier<IndexBlockSupplier>();
-	env.addDefaultConstructibleSupplier<VertexBlockSupplier>();
-	env.addDefaultConstructibleSupplier<VertexSupplier>();
-	// Build the Reader
-	Reader read = env.build();
+	Reader read = env.addDefaultConstructibleSupplier<FileSupplier>().
+			addDefaultConstructibleSupplier<HeaderSupplier>().
+			addDefaultConstructibleSupplier<MaterialBlockSupplier>().
+			addDefaultConstructibleSupplier<ObjectBlockSupplier>().
+			addDefaultConstructibleSupplier<IndexBlockSupplier>().
+			addDefaultConstructibleSupplier<VertexBlockSupplier>().
+			addDefaultConstructibleSupplier<VertexSupplier>().build();
 	// Open the file
 	ifstream file;
 	file.open (R"wpykn(C:\Users\Carbon\Documents\CreativeWorkspace\LoLBearbeitung\data\characters\ahri\skins\base\ahri.skn)wpykn", std::ios::in | std::ios::binary);
