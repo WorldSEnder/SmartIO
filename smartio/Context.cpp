@@ -10,32 +10,43 @@
 namespace io
 {
 
-Context::Context(const supplier_map reader, istream& stream)
-	: reference(std::move(reader)), stream(stream) {}
+Context::Context(const supplier_map reader, istream& stream) :
+        reference(std::move(reader)), stream(stream)
+{
+}
 
-Context::~Context() {}
+Context::~Context()
+{
+}
 
 istream&
-Context::getStream() {
-	return stream;
+Context::getStream()
+{
+    return stream;
 }
 
-void
-Context::setValue(key_t key, value_t val) {
-	contextVars[key] = val;
+void Context::setValue(key_t key, value_t val)
+{
+    contextVars[key] = val;
 }
 
-Context::value_t
-Context::getValue(key_t key, value_t defaultVal) {
-	auto&& it = contextVars.find(key);
-	if(it == contextVars.end())
-		return defaultVal;
-	return it->second;
+Context::value_t Context::getValue(key_t key, value_t defaultVal) const
+{
+    const auto& it = contextVars.find(key);
+    if (it == contextVars.end())
+        return defaultVal;
+    return it->second;
 }
 
-bool
-Context::hasValue(key_t key) {
-	return contextVars.find(key) != contextVars.end();
+bool Context::hasValue(key_t key) const
+{
+    return contextVars.find(key) != contextVars.end();
+}
+
+Context::value_t&
+Context::operator[](key_t key)
+{
+    return contextVars[key];
 }
 
 } /* namespace io */

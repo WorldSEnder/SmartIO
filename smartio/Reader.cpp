@@ -12,9 +12,13 @@
 namespace io
 {
 
-Reader::Reader(supplier_map supply)
-		: suppliers(std::move(supply)) {}
+Reader::Reader(supplier_map supply) :
+        suppliers(std::move(supply))
+{
+}
 
-Reader::~Reader() {}
+Reader::~Reader()
+{
+}
 
 } /* namespace io */

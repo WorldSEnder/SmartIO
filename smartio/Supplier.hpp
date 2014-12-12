@@ -6,54 +6,66 @@
  */
 #pragma once
 
-#include <istream>
-
 #include "traits.hpp"
 
-namespace io {
+namespace io
+{
 
 // Forward declare Context
 class Context;
-
-using std::istream;
 /**
  * Base class for suppliers so we can store them in a list
  */
-class SupplierBase {
+class SupplierBase
+{
 };
 /**
  * A supplier for the type T
  */
 template<typename T>
-class Supplier : public SupplierBase {
+class Supplier : public SupplierBase
+{
 public:
-	typedef typename supply_t<T>::type item_t;
+    using item_t = supply_t< T >;
 
-	virtual ~Supplier() {};
-	/**
-	 * Supplies an item of the type
-	 */
-	virtual item_t supply(Context& reader) const = 0;
+    virtual ~Supplier()
+    {
+    }
+    ;
+    /**
+     * Supplies an item of the type
+     */
+    virtual item_t supply(Context&) const = 0;
 };
 
 template<typename T>
-class BoundSupplier {
-	// TODO: change this to std::shared_ptr, too?
-	const Supplier<T>& reference;
-	istream& stream;
+class BoundSupplier
+{
 public:
-	BoundSupplier() = delete;
-	BoundSupplier(const Supplier<T>&, istream&);
-	BoundSupplier(Supplier<T>&&, istream&) = delete;
-	typedef typename supply_t<T>::type item_t;
+    using supplier_t = Supplier< T >;
+    using typename supplier_t::item_t;
+private:
+    // TODO: change this to std::shared_ptr, too?
+    const supplier_t& reference;
+    Context& ctx;
+public:
+    BoundSupplier() = delete;
+    BoundSupplier(const supplier_t& supplier, Context& context) :
+            ctx(context), reference(supplier)
+    {
+    }
+    BoundSupplier(supplier_t&&, Context&) = delete;
 
-	virtual ~BoundSupplier() {};
-	/**
-	 * Supplies an item from a previously bound istream
-	 */
-	item_t supply() const {
-		return reference.supply(stream);
-	}
+    virtual ~BoundSupplier()
+    {
+    }
+    /**
+     * Supplies an item from a previously bound context
+     */
+    item_t supply()
+    {
+        return reference.supply(ctx);
+    }
 };
 
 } /* namespace io */

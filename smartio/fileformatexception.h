@@ -17,12 +17,12 @@ namespace io
 class fileformatexception : std::logic_error
 {
 private:
-	const char *mess;
-	static std::ostringstream cnvt;
+    const char *mess;
+    static std::ostringstream cnvt;
 public:
-	fileformatexception(const char *message);
-	virtual ~fileformatexception();
-	virtual const char* what() const throw();
+    fileformatexception(const char *message);
+    virtual ~fileformatexception();
+    virtual const char* what() const throw ();
 };
 
 } /* namespace io */
