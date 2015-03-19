@@ -55,7 +55,7 @@ private:
     Context(const supplier_map, istream&);
     // Helper function to find supplier in map
     template<typename T>
-    const Supplier< supply_t< T > >& retrieveSupplier() const;
+    const Supplier< T >& retrieveSupplier() const;
 public:
     virtual ~Context();
     /**

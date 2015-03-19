@@ -5,9 +5,9 @@
  *      Author: Carbon
  */
 
-#include "Reader.hpp"
-
 #include <utility>
+
+#include "Reader.hpp"
 
 namespace io
 {
@@ -19,6 +19,11 @@ Reader::Reader(supplier_map supply) :
 
 Reader::~Reader()
 {
+}
+
+Context Reader::createContext(istream& stream) const
+{
+    return Context(this->suppliers, stream);
 }
 
 } /* namespace io */

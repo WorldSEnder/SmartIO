@@ -13,7 +13,7 @@ using std::invalid_argument;
 using typetoken::token_t;
 
 template<typename T>
-const Supplier< supply_t< T > >& Context::retrieveSupplier() const
+const Supplier< T >& Context::retrieveSupplier() const
 {
     using supplier_t = Supplier< T >;
     using item_t = typename supplier_t::item_t;
@@ -39,28 +39,27 @@ template<typename T>
 supply_t< T > Context::construct()
 {
     using supplier_t = Supplier< T >;
-    using item_t = typename supplier_t::item_t;
-    const supplier_t& supp = this->retrieveSupplier< item_t >();
+    const supplier_t& supp = this->retrieveSupplier< T >();
     return supp.supply(*this);
 }
 
 template<typename T>
 Context& Context::operator>>(T& val)
 {
-    val = construct< T >();
+    val = *construct< T >();
     return *this;
 }
 
 template<typename T>
 T& Context::operator>>=(T& val)
 {
-    return val = construct<T>();
+    return val = *construct<T>();
 }
 
 template<typename T>
 Context::operator T()
 {
-    return construct< T >();
+    return *construct< T >();
 }
 
 template<typename T, std::size_t N>

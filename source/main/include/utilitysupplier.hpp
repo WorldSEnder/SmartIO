@@ -89,13 +89,13 @@ struct __impl_aggregate< T, __list < Args... > > : Supplier< T >
     using typename Supplier< T >::item_t;
     item_t supply(Context& ctx) const override
     {
-        return __impl_aggregate<T, __list<Args...>>::construct(ctx);
+        return construct(ctx);
     }
 
     static inline item_t construct(Context& ctx)
     {
         return
-        {   ctx.construct<Args>()...};
+        std::unique_ptr<T>(new T{ (*ctx.construct<Args>())...});
     }
 };
 
@@ -104,18 +104,19 @@ template<typename T>
 struct memcpy_supplier : Supplier< T >
 {
     using typename Supplier< T >::item_t;
-    static constexpr std::size_t size = sizeof(item_t);
+    static constexpr std::size_t size = sizeof(T);
     union
     {
         char buffer[size];
-        item_t object;
+        T *object;
     } mutable converter;
 
     item_t supply(Context& ctx) const override
     {
         istream& stream = ctx.getStream();
+        converter.object = new T;
         stream.read(converter.buffer, size);
-        return converter.object;
+        return std::unique_ptr<T>(converter.object);
     }
 };
 /**
@@ -136,12 +137,12 @@ struct move_supplier : Supplier< T >
 
     item_t supply(Context& ctx) const override
     {
-        return move_supplier<T, args...>::construct(ctx);
+        return construct(ctx);
     }
 
     static inline item_t construct(Context& ctx)
     {
-        return T(std::move(ctx.construct<args>())...);
+        return std::unique_ptr<T>(new T(std::move(ctx.construct<args>())...));
     }
 };
 
@@ -160,7 +161,7 @@ template<typename T>
 void fill_list(std::list<T>& list, Context& ctx, std::size_t c)
 {
     while(c --> 0)
-        list.push_back( ctx.construct<T>() );
+        list.push_back( *ctx.construct<T>() );
 }
 
 template<typename T,

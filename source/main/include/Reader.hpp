@@ -51,10 +51,7 @@ public:
     template<typename T>
     const Supplier< supply_t< T > >& getSupplier() const;
 
-    Context createContext(istream& stream) const
-    {
-        return Context(this->suppliers, stream);
-    }
+    Context createContext(istream& stream) const;
     /**
      * Reads a new object <T> from the file supplied.
      * If you want to construct multiple objects of the same type rapidly

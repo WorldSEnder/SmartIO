@@ -22,8 +22,8 @@ private:
     static constexpr std::size_t item_size = sizeof(I);
     union convert_t
     {
-        char buffer[item_size];
-        item_t item;
+        char (*buffer)[item_size];
+        I *item;
     } mutable converter;
 public:
     stdsupplier_t(void);

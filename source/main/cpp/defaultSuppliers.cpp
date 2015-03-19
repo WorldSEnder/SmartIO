@@ -24,11 +24,12 @@ auto stdsupplier_t< T >::supply(
         Context& context) const -> typename stdsupplier_t<T>::item_t
 {
     istream& is = context.getStream();
-    is.read(this->converter.buffer, item_size);
+    this->converter.item = new T;
+    is.read(*(this->converter.buffer), item_size);
     if (is.fail())
         throw fileformatexception(
                 "Unexpected eof. Couldn't fully read std-type");
-    return this->converter.item;
+    return std::unique_ptr<T>(this->converter.item);
 }
 
 #pragma push_macro("DEFINESUPPLIER")
