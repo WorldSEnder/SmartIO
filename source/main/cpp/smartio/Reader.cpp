@@ -7,12 +7,12 @@
 
 #include <utility>
 
-#include "Reader.hpp"
+#include "smartio/Reader.hpp"
 
 namespace io
 {
 
-Reader::Reader(supplier_map supply) :
+Reader::Reader(map_t supply) :
         suppliers(std::move(supply))
 {
 }
@@ -21,9 +21,9 @@ Reader::~Reader()
 {
 }
 
-Context Reader::createContext(istream& stream) const
+ReadContext Reader::from(input& stream) const
 {
-    return Context(this->suppliers, stream);
+    return ReadContext(this->suppliers, stream);
 }
 
 } /* namespace io */

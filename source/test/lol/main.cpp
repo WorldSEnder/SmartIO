@@ -59,11 +59,11 @@ typedef struct
 
 class IndexBlockSupplier : public io::Supplier< indexBlock_t >
 {
-    std::unique_ptr<indexBlock_t> supply(io::Context& ctx) const override
+    std::unique_ptr<indexBlock_t> supply(io::ReadContext& ctx) const override
     {
         indexBlock_t *target = new indexBlock_t;
         io::utility::fill_list(target->indices, ctx, ctx[INDEX_NBR_KEY]);
-        return std::unique_ptr<indexBlock_t>(target);
+        return {target};
     }
 };
 
@@ -91,11 +91,11 @@ typedef struct
 
 class VertexBlockSupplier : public io::Supplier< vertexBlock_t >
 {
-    std::unique_ptr<vertexBlock_t> supply(io::Context& ctx) const override
+    std::unique_ptr<vertexBlock_t> supply(io::ReadContext& ctx) const override
     {
         vertexBlock_t *target = new vertexBlock_t;
         io::utility::fill_list(target->vertices, ctx, ctx[VERTEX_NBR_KEY]);
-        return std::unique_ptr<vertexBlock_t>(target);
+        return {target};
     }
 };
 
@@ -109,13 +109,13 @@ typedef struct
 
 class ObjectBlockSupplier : public io::Supplier< objectBlock_t >
 {
-    std::unique_ptr<objectBlock_t> supply(io::Context& ctx) const override
+    std::unique_ptr<objectBlock_t> supply(io::ReadContext& ctx) const override
     {
         objectBlock_t *trgt = new objectBlock_t;
         ctx[INDEX_NBR_KEY] = (ctx >>= trgt->nbrIndices);
         ctx[VERTEX_NBR_KEY] = (ctx >>= trgt->nbrVertices);
         ctx >> trgt->indices >> trgt->vertices;
-        return std::unique_ptr<objectBlock_t>(trgt);
+        return {trgt};
     }
 };
 
@@ -129,16 +129,19 @@ typedef struct
 
 class FileSupplier : public io::Supplier< sknFile_t >
 {
-    std::unique_ptr<sknFile_t> supply(io::Context& ctx) const override
+    std::unique_ptr<sknFile_t> supply(io::ReadContext& ctx) const override
     {
         sknFile_t *trgt = new sknFile_t;
         ctx >> trgt->header;
         uint32_t c = 0;
         if (trgt->header.matFlag)
+        {
+
             c = (ctx >>= trgt->nbrMats);
+        }
         io::utility::fill_list(trgt->materials, ctx, c);
         io::utility::fill_list(trgt->objects, ctx, trgt->header.nbrObjects);
-        return std::unique_ptr<sknFile_t>(trgt);
+        return {trgt};
     }
 };
 
@@ -146,14 +149,14 @@ int main(void)
 {
     io::Environment env;
     // Add suppliers
-    io::Reader read =
-            env.addDefaultConstructibleSupplier< FileSupplier >().
-                    addDefaultConstructibleSupplier< HeaderSupplier >().
-                    addDefaultConstructibleSupplier< MaterialBlockSupplier >().
-                    addDefaultConstructibleSupplier< ObjectBlockSupplier >().
-                    addDefaultConstructibleSupplier< IndexBlockSupplier >().
-                    addDefaultConstructibleSupplier< VertexBlockSupplier >().
-                    addDefaultConstructibleSupplier< VertexSupplier >().build();
+    env.emplaceSupplier< FileSupplier >();
+    env.emplaceSupplier< HeaderSupplier >();
+    env.emplaceSupplier< MaterialBlockSupplier >();
+    env.emplaceSupplier< ObjectBlockSupplier >();
+    env.emplaceSupplier< IndexBlockSupplier >();
+    env.emplaceSupplier< VertexBlockSupplier >();
+    env.emplaceSupplier< VertexSupplier >();
+    io::Reader read = env.build();
     // Open the file
     std::ifstream file(
             R"wpykn(C:\Users\Carbon\Documents\CreativeWorkspace\LoLBearbeitung\data\characters\ahri\skins\base\ahri.skn)wpykn",
@@ -166,7 +169,7 @@ int main(void)
     // And read the objects
     try
     {
-        io::Context context = read.createContext(file);
+        io::ReadContext context = read.with(file);
         sknFile_t sknData = (sknFile_t) context;
         std::cout << sknData.objects.front().vertices.vertices.back().pos[1];
     } catch (std::invalid_argument& e)

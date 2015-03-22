@@ -6,13 +6,18 @@
  */
 #include <istream>
 
-#include "defaultSuppliers.hpp"
-#include "fileformatexception.h"
+#include "smartio/defaultSuppliers.hpp"
+#include "smartio/fileformatexception.h"
 
 namespace io
 {
 namespace defaultsuppliers
 {
+
+template<typename I>
+const ::io::supplier_key< I >
+stdsupplier_t< I >::KEY = 0;
+
 template<typename T>
 stdsupplier_t< T >::stdsupplier_t()
 {
@@ -21,15 +26,19 @@ stdsupplier_t< T >::stdsupplier_t()
 
 template<typename T>
 auto stdsupplier_t< T >::supply(
-        Context& context) const -> typename stdsupplier_t<T>::item_t
+        ReadContext& context) const -> typename stdsupplier_t<T>::item_t
 {
+    using ::std::istream;
+
     istream& is = context.getStream();
     this->converter.item = new T;
     is.read(*(this->converter.buffer), item_size);
     if (is.fail())
         throw fileformatexception(
                 "Unexpected eof. Couldn't fully read std-type");
-    return std::unique_ptr<T>(this->converter.item);
+    std::unique_ptr<T> item{this->converter.item};
+    this->converter.item = nullptr;
+    return item;
 }
 
 #pragma push_macro("DEFINESUPPLIER")

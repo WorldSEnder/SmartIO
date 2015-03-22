@@ -9,7 +9,7 @@
 
 #include <ostream>
 
-#include "traits.hpp"
+#include "smartio/traits.hpp"
 
 namespace io
 {

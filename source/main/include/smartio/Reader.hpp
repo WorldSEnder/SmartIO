@@ -6,22 +6,17 @@
  */
 #pragma once
 
-#include <unordered_map>
-#include <memory>
 #include <istream>
 
-#include "Context.hpp"
-#include "Supplier.hpp"
-#include "typetoken.hpp"
-#include "traits.hpp"
+#include "smartio/detail.hpp"
+#include "smartio/Context.hpp"
+#include "smartio/Supplier.hpp"
 
 namespace io
 {
-using std::unordered_map;
-using std::istream;
-using std::shared_ptr;
 
-using typetoken::token_t;
+class Environment;
+
 /**
  * A reader actually reads elements from a given file/stream. When created
  * from an Environment all currently registered Suppliers are copied and
@@ -31,15 +26,9 @@ using typetoken::token_t;
  */
 class Reader
 {
-    using supplier_map = unordered_map<token_t, shared_ptr<const SupplierBase>>;
-private:
-    Reader(void);
-    const supplier_map suppliers;
 public:
-    /**
-     * Constructs a new reader from a map of suppliers
-     */
-    Reader(supplier_map);
+    using input = ::std::istream;
+
     virtual ~Reader();
     /**
      * Gets a reference to a registered supplier for the given type. If none is
@@ -49,9 +38,11 @@ public:
      * <T> the type that should be supplied
      */
     template<typename T>
-    const Supplier< supply_t< T > >& getSupplier() const;
-
-    Context createContext(istream& stream) const;
+    SupplierPtr<T> getSupplier(supplier_key<T> key) const;
+    /**
+     * Creates a context that reads from the stream given.
+     */
+    ReadContext from(input& stream) const;
     /**
      * Reads a new object <T> from the file supplied.
      * If you want to construct multiple objects of the same type rapidly
@@ -66,8 +57,19 @@ public:
      * <T> the type of object to be created
      */
     template<typename T>
-    supply_t< T > construct(istream& f) const;
+    T construct(input& stream, supplier_key<T> key) const;
+private:
+    using map_t = _detail::supplier_map;
 
+    Reader();
+    /**
+     * Constructs a new reader from a map of suppliers
+     */
+    Reader(map_t map);
+
+    friend Environment;
+
+    const map_t suppliers;
 };
 
 } /* namespace io */

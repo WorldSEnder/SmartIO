@@ -3,11 +3,18 @@ set(target smartio)
 message("Lib ${target}")
 
 # Collect all sources
-file(GLOB SRC_INCLUDES "include/*.h" "include/*.hpp" "include/*.tpp")
-file(GLOB SRC_CPP_FILES "cpp/*.cpp" "cpp/*.cxx")
+file(GLOB_RECURSE SRC_INCLUDES
+     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.tpp")
+file(GLOB_RECURSE SRC_CPP_FILES
+     "${CMAKE_CURRENT_SOURCE_DIR}/cpp/*.cpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/cpp/*.cxx")
 
 # Binary files, those get added as blobs into the executable
-file(GLOB SRC_BINARY RELATIVE res "res/*")
+file(GLOB_RECURSE SRC_BINARY
+     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/res/"
+     "${CMAKE_CURRENT_SOURCE_DIR}/res/*")
 
 set(SRC_ALL_FILES ${SRC_CPP_FILES})
 
@@ -18,13 +25,9 @@ include_directories(BEFORE "include")
 set(ADDITIONAL_FLAGS "-fexceptions -std=c++11")
 
 # Add the library as build
-if(OPTION_BUILD_STATIC)
-    set(BUILD_TYPE STATIC)
-else()
-    set(BUILD_TYPE SHARED)
-endif()
 
-add_library(${target} ${BUILD_TYPE} "${SRC_ALL_FILES}")
+message("Found sources: ${SRC_ALL_FILES}")
+add_library(${target} "${SRC_ALL_FILES}")
 
 set_target_properties(${target}
     PROPERTIES
