@@ -92,11 +92,10 @@ namespace io
      * and only if you are sure that all registered Suppliers are alive.
      */
     Reader
-    build ();
+    build () const;
 
   private:
-    using map_t = _detail::supplier_map;
-    map_t suppliers;
+    supplier_map suppliers;
   };
 
 } /* namespace io */

@@ -52,7 +52,6 @@ namespace io
       using supplier_t = Supplier< T >;
       using typename supplier_t::item_t;
     private:
-      // TODO: change this to std::shared_ptr, too?
       SupplierPtr<T> reference;
       ReadContext& ctx;
       BoundSupplier () = delete;

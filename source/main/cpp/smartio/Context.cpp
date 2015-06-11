@@ -10,7 +10,7 @@
 namespace io
 {
 
-  ReadContext::ReadContext (const map_t reader, input& stream) :
+  ReadContext::ReadContext (supplier_map reader, input& stream) :
       reference (std::move (reader)), stream (stream)
   {
   }
@@ -32,14 +32,24 @@ namespace io
     return stream;
   }
 
+  context_base::context_base () :
+      contextVars ()
+  {
+
+  }
+
+  context_base::~context_base ()
+  {
+  }
+
   void
-  ReadContext::setValue (key_t key, value_t val)
+  context_base::setValue (key_t key, value_t val)
   {
     contextVars[key] = val;
   }
 
   ReadContext::value_t
-  ReadContext::getValue (key_t key, value_t defaultVal) const
+  context_base::getValue (key_t key, value_t defaultVal) const
   {
     const auto& it = contextVars.find (key);
     if (it == contextVars.end ())
@@ -48,13 +58,13 @@ namespace io
   }
 
   bool
-  ReadContext::hasValue (key_t key) const
+  context_base::hasValue (key_t key) const
   {
     return contextVars.find (key) != contextVars.end ();
   }
 
   ReadContext::value_t&
-  ReadContext::operator[] (key_t key)
+  context_base::operator[] (key_t key)
   {
     return contextVars[key];
   }

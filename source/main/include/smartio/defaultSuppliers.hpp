@@ -28,11 +28,9 @@ namespace io
 	  I *item;
 	}mutable converter;
       public:
-	static const ::io::supplier_key<I> KEY;
-
 	stdsupplier_t (void);
 	item_t
-	supply (ReadContext& reader) const override;
+	dosupply (ReadContext& reader) const override;
       };
 
 #pragma push_macro("DECLSUPPLIER")

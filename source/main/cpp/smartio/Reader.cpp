@@ -12,7 +12,7 @@
 namespace io
 {
 
-  Reader::Reader (map_t supply) :
+  Reader::Reader (supplier_map supply) :
       suppliers (std::move (supply))
   {
   }

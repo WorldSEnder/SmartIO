@@ -19,6 +19,49 @@ namespace io
 // Forward declare for friend
   class Reader;
 
+  using context_key = size_t;
+  using context_val = size_t;
+  /**
+   * Holds all of context that is shared between Read and Write
+   */
+  class context_base
+  {
+  public:
+    context_base ();
+    virtual
+    ~context_base ();
+    /**
+     * Sets the context variable for key.
+     */
+    void
+    setValue (context_key, context_val);
+    /**
+     * Retrieves the value previously set for the key or default if it hasn't
+     * been set. The context is not changed by this call.
+     */
+    context_val
+    getValue (context_key, context_val) const;
+    /**
+     * Checks if a value for key has been set
+     */
+    bool
+    hasValue (context_key) const;
+    /**
+     * A suitable variant to setValue/getValue.
+     * If the key doesn't yet exist a value of zero is assigned to it. The returned
+     * reference can be used to effectively change the value of the Context-value.
+     */
+    context_val&
+    operator[] (context_key);
+  private:
+    using key_t = context_key;
+    using value_t = context_val;
+
+    using var_map = std::unordered_map<context_key, context_val>;
+
+    var_map contextVars;
+  };
+
   /**
    * Works as a temporary context for Suppliers and thus is dependent
    * on a previously created Reader to create objects from. This reader
@@ -27,15 +70,20 @@ namespace io
    * The difference to Reader is that also the input stream is already set
    * and also kept as a reference - introducing another lifetime dependence.
    */
-  class ReadContext
+  class ReadContext : public context_base
   {
     template<typename T, size_t N>
       using arr_ref = T(&)[N];
 
+    template<typename T>
+      static inline T
+      default_construct ();
+
+    template<typename T>
+      using supplier = T (*)();
+
   public:
     using input = ::std::istream;
-    using key_t = std::size_t;
-    using value_t = std::size_t;
 
     virtual
     ~ReadContext ();
@@ -49,7 +97,7 @@ namespace io
      */
     template<typename T>
       BoundSupplier<T>
-      getSupplier (supplier_key<T> key);
+      getSupplier (supplier_key<T> key = supplier_key<T>::default_ ());
     /**
      * Constructs a new object from this context using the stream that was
      * supplied in the context's constructor. Altering the stream
@@ -62,20 +110,11 @@ namespace io
      */
     template<typename T>
       supply_t<T>
-      get (supplier_key<T> key);
+      get (supplier_key<T> key = supplier_key<T>::default_ ());
     template<typename T>
       T
-      construct (supplier_key<T> key);
-    /**
-     * Default-reads an object. That is, uses the currently for the object
-     * type registered default supplier.
-     */
-    template<typename T>
-      supply_t<T>
-      get ();
-    template<typename T>
-      T
-      construct ();
+      construct (supplier_key<T> key = supplier_key<T>::default_ (),
+		 supplier<T> missing_item = default_construct<T>);
     /**
      * Returns the i-stream this Context is bound to. Altering the stream
      * effectively changes the context thus this method can't be called from
@@ -85,30 +124,6 @@ namespace io
     getStream ();
     const input&
     getStream () const;
-
-    /**
-     * Sets the context variable for key.
-     */
-    void
-    setValue (key_t, value_t);
-    /**
-     * Retrieves the value previously set for the key or default if it hasn't
-     * been set. The context is not changed by this call.
-     */
-    value_t
-    getValue (key_t, value_t) const;
-    /**
-     * Checks if a value for key has been set
-     */
-    bool
-    hasValue (key_t) const;
-    /**
-     * A suitable variant to setValue/getValue.
-     * If the key doesn't yet exist a value of zero is assigned to it. The returned
-     * reference can be used to effectively change the value of the Context-value.
-     */
-    value_t&
-    operator[] (key_t);
 
     // Read-like operations (uses default key)
     /**
@@ -133,15 +148,10 @@ namespace io
       operator>>= (arr_ref<T, N> out);
 
     friend io::Reader;
-    // TODO: think over that again friending
-
   private:
-    using map_t = _detail::supplier_map;
-    using var_map = std::unordered_map<key_t, value_t>;
     // Context variables
-    const map_t reference;
+    const supplier_map reference;
     input& stream;
-    var_map contextVars;
     ReadContext () = delete;
     /**
      * Constructs a Context from a reference to a (non-temporary) map of
@@ -149,16 +159,12 @@ namespace io
      * sure that supplier_map is type safe when given from a user, so we
      * friend Reader.
      */
-    ReadContext (const map_t suppliers, input& stream);
+    ReadContext (supplier_map suppliers, input& stream);
     // Helper function to find supplier in map
-    template<typename S>
-      SupplierPtr<S>
-      retrieveSupplier (supplier_key<S> key) const;
-    // Finds the "default supplier", currently simple the first one
-    // in the map...
-    template<typename S>
-      SupplierPtr<S>
-      retrieveSupplier () const;
+    template<typename T>
+      SupplierPtr<T>
+      retrieveSupplier (supplier_key<T> key =
+	  supplier_key<T>::default_ ()) const;
   };
 
 } /* namespace io */

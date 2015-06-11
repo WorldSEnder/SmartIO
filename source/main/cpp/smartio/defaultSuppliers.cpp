@@ -13,10 +13,6 @@ namespace io
 {
   namespace defaultsuppliers
   {
-
-    template<typename I>
-      const ::io::supplier_key<I> stdsupplier_t<I>::KEY = 0;
-
     template<typename T>
       stdsupplier_t<T>::stdsupplier_t ()
       {
@@ -24,7 +20,7 @@ namespace io
 
     template<typename T>
       auto
-      stdsupplier_t<T>::supply (
+      stdsupplier_t<T>::dosupply (
 	  ReadContext& context) const -> typename stdsupplier_t<T>::item_t
       {
 	using ::std::istream;

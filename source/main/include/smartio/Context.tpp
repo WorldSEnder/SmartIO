@@ -17,36 +17,15 @@ namespace io
     SupplierPtr<T>
     ReadContext::retrieveSupplier (supplier_key<T> key) const
     {
-      using _detail::supplier_entry;
-
-      const supplier_entry& entry = _detail::getEntry<T> (reference, key);
-      // Reinterpret to actual type and get item
-      SupplierPtr<T> ptr = _detail::fromEntry<T> (entry);
-      return ptr;
+      return io::getSupplier(this->reference, key);
     }
 
   template<typename T>
-    SupplierPtr<T>
-    ReadContext::retrieveSupplier () const
-    {
-      using _detail::supplier_entry;
-      using _detail::supplier_list;
-      using typetoken::token_t;
-
-      token_t token = typetoken::getToken<T> ();
-
-      const auto& entry = reference.find (token);
-      if (entry == reference.end ())
-	return
-	  { nullptr};
-      const supplier_list& list = entry->second;
-      if (list.size () == 0)
-	return
-	  { nullptr};
-      SupplierPtr<T> ptr = _detail::fromEntry<T> (list[0]);
-      // Reinterpret to actual type and get item
-      return ptr;
-    }
+    T
+    ReadContext::default_construct()
+  {
+    return T{};
+  }
 
   template<typename T>
     BoundSupplier<T>
@@ -68,30 +47,11 @@ namespace io
     }
   template<typename T>
     T
-    ReadContext::construct (supplier_key<T> key)
+    ReadContext::construct (supplier_key<T> key, supplier<T> missing_item)
     {
       T *ptr = this->get<T> (key).release ();
-      // IDEA: add missing item policy
-      // if(ptr == nullptr) return T{};
-      return *ptr;
-    }
-  template<typename T>
-    supply_t<T>
-    ReadContext::get ()
-    {
-      SupplierPtr<T> ptr = this->retrieveSupplier<T> ();
-      if (ptr == nullptr)
-	return
-	  { nullptr};
-      return ptr->supply (*this);
-    }
-  template<typename T>
-    T
-    ReadContext::construct ()
-    {
-      T *ptr = this->get<T> ().release ();
-      // IDEA: add missing item policy
-      // if(ptr == nullptr) return T{};
+      if(ptr == nullptr)
+	return missing_item();
       return *ptr;
     }
 

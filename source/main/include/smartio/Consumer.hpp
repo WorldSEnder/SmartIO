@@ -38,7 +38,6 @@ namespace io
       ~Consumer ()
       {
       }
-      ;
       /**
        * Use this to set environment variables you might need
        * to communicate to parents
@@ -55,7 +54,6 @@ namespace io
   template<typename T>
     class BoundConsumer
     {
-      // TODO: change this to std::shared_ptr, too?
       const Consumer<T>& reference;
       WriteContext& ctx;
     public:

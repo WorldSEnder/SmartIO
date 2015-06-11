@@ -40,7 +40,7 @@ namespace io
      */
     template<typename T>
       SupplierPtr<T>
-      getSupplier (supplier_key<T> key) const;
+      getSupplier (supplier_key<T> key = supplier_key<T>::default_ ()) const;
     /**
      * Creates a context that reads from the stream given.
      */
@@ -61,19 +61,18 @@ namespace io
      */
     template<typename T>
       T
-      construct (input& stream, supplier_key<T> key) const;
+      construct (input& stream, supplier_key<T> key =
+		     supplier_key<T>::default_ ()) const;
   private:
-    using map_t = _detail::supplier_map;
-
     Reader ();
     /**
      * Constructs a new reader from a map of suppliers
      */
-    Reader (map_t map);
+    Reader (supplier_map map);
 
     friend Environment;
 
-    const map_t suppliers;
+    const supplier_map suppliers;
   };
 
 } /* namespace io */

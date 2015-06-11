@@ -44,7 +44,7 @@ namespace io
   }
 
   Reader
-  Environment::build ()
+  Environment::build () const
   {
     return
       { this->suppliers};
