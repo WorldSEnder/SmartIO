@@ -22,7 +22,7 @@ set(SRC_ALL_FILES ${SRC_CPP_FILES})
 # Add the includes
 include_directories(BEFORE "include")
 
-set(ADDITIONAL_FLAGS "-fexceptions -std=c++11")
+set(ADDITIONAL_FLAGS "-fexceptions -std=c++1y")
 
 # Add the library as build
 
@@ -38,6 +38,6 @@ set_target_properties(${target}
     COMPILE_FLAGS               "${DEFAULT_COMPILE_FLAGS} ${ADDITIONAL_FLAGS}"
     LINK_FLAGS_DEBUG            "${DEFAULT_LINKER_FLAGS_DEBUG}"
     LINK_FLAGS_RELEASE          "${DEFAULT_LINKER_FLAGS_RELEASE}"
-    DEBUG_POSTFIX               "d${DEBUG_POSTFIX}")
+    DEBUG_POSTFIX               "${DEBUG_POSTFIX}")
 
 

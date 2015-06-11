@@ -107,14 +107,14 @@ namespace io
      * when the entry is not found.
      */
     template<typename T>
-      const storage_entry&
+      storage_entry
       getEntry (const storage_map& map, const storage_key<T>& key);
     /**
      * Puts a new entry in the map and returns it's key. If it
      * is the first entry, it also is the default entry.
      */
     template<typename T>
-      const storage_key<T>
+      storage_key<T>
       putEntry (storage_map& map, storage_entry entry);
     /**
      * Makes the entry associated with key the default entry in the map
@@ -137,7 +137,7 @@ namespace io
    * when the entry is not found.
    */
   template<typename T>
-    inline const SupplierPtr<T>&
+    inline SupplierPtr<T>
     getSupplier (const supplier_map& map, const supplier_key<T>& key)
     {
       return _detail::supplierFromEntry<T> (_detail::getEntry (map, key));

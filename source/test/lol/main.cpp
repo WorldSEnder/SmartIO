@@ -59,11 +59,11 @@ typedef struct
 
 class IndexBlockSupplier : public io::Supplier< indexBlock_t >
 {
-    std::unique_ptr<indexBlock_t> supply(io::ReadContext& ctx) const override
+    std::unique_ptr<indexBlock_t> dosupply(io::ReadContext& ctx) const override
     {
         indexBlock_t *target = new indexBlock_t;
         io::utility::fill_list(ctx, target->indices, ctx[INDEX_NBR_KEY]);
-        return {target};
+        return item_t{target};
     }
 };
 
@@ -91,11 +91,11 @@ typedef struct
 
 class VertexBlockSupplier : public io::Supplier< vertexBlock_t >
 {
-    std::unique_ptr<vertexBlock_t> supply(io::ReadContext& ctx) const override
+    std::unique_ptr<vertexBlock_t> dosupply(io::ReadContext& ctx) const override
     {
         vertexBlock_t *target = new vertexBlock_t;
         io::utility::fill_list(ctx, target->vertices, ctx[VERTEX_NBR_KEY]);
-        return {target};
+        return item_t{target};
     }
 };
 
@@ -109,13 +109,13 @@ typedef struct
 
 class ObjectBlockSupplier : public io::Supplier< objectBlock_t >
 {
-    std::unique_ptr<objectBlock_t> supply(io::ReadContext& ctx) const override
+    std::unique_ptr<objectBlock_t> dosupply(io::ReadContext& ctx) const override
     {
         objectBlock_t *trgt = new objectBlock_t;
         ctx[INDEX_NBR_KEY] = (ctx >>= trgt->nbrIndices);
         ctx[VERTEX_NBR_KEY] = (ctx >>= trgt->nbrVertices);
         ctx >> trgt->indices >> trgt->vertices;
-        return {trgt};
+        return item_t{trgt};
     }
 };
 
@@ -129,7 +129,7 @@ typedef struct
 
 class FileSupplier : public io::Supplier< sknFile_t >
 {
-    std::unique_ptr<sknFile_t> supply(io::ReadContext& ctx) const override
+    std::unique_ptr<sknFile_t> dosupply(io::ReadContext& ctx) const override
     {
         sknFile_t *trgt = new sknFile_t;
         ctx >> trgt->header;
@@ -141,7 +141,7 @@ class FileSupplier : public io::Supplier< sknFile_t >
         }
         io::utility::fill_list(ctx, trgt->materials, c);
         io::utility::fill_list(ctx, trgt->objects, trgt->header.nbrObjects);
-        return {trgt};
+        return item_t{trgt};
     }
 };
 
@@ -170,7 +170,7 @@ int main(void)
     try
     {
         io::ReadContext context = read.from(file);
-        sknFile_t sknData = (sknFile_t) context;
+        sknFile_t sknData = context.construct<sknFile_t>();
         std::cout << sknData.objects.front().vertices.vertices.back().pos[1];
     } catch (std::invalid_argument& e)
     {

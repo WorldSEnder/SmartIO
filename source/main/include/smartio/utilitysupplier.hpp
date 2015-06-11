@@ -10,6 +10,7 @@
 #include <list>
 #include <utility>
 #include <functional>
+#include <istream>
 
 #include "smartio/Supplier.hpp"
 
@@ -103,9 +104,9 @@ namespace io
 	  static inline item_t
 	  construct (ReadContext& ctx)
 	  {
-	    return
+	    return item_t
 	      { new T
-		  { (ctx.construct<Args>())...}};
+		{ (ctx.construct<Args>())... } };
 	  }
 	};
 
@@ -120,18 +121,18 @@ namespace io
 
 	union
 	{
-	  char buffer[size];
+	  char buffer[n_size];
 	  T *object;
 	}mutable converter;
 
 	item_t
 	dosupply (ReadContext& ctx) const override
 	{
-	  istream & stream = ctx.getStream ();
+	  std::istream& stream = ctx.getStream ();
 	  converter.object = new T;
-	  stream.read (converter.buffer, size);
-	  return
-	    { converter.object};
+	  stream.read (converter.buffer, n_size);
+	  return item_t
+	    { converter.object };
 	}
       };
     /**

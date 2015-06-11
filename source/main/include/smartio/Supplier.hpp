@@ -87,3 +87,5 @@ namespace io
     };
 
 } /* namespace io */
+
+#include "smartio/Supplier.tpp"

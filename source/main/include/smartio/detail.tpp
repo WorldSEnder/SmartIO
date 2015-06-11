@@ -93,7 +93,7 @@ namespace io
 //    }
 
     template<typename T>
-      const storage_entry&
+      storage_entry
       getEntry (const storage_map& map, const storage_key<T>& key)
       {
 	if (key == storage_key<T>::invalid ())
@@ -113,7 +113,7 @@ namespace io
     }
 
 template<typename T>
-  const storage_key<T>
+  storage_key<T>
   putEntry (storage_map& map, storage_entry entry)
   {
     if(entry == nullptr)

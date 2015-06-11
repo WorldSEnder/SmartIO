@@ -59,7 +59,7 @@ namespace io
     inline ReadContext&
     ReadContext::operator>> (T& out)
     {
-      (*this) >> out;
+      (*this) >>= out;
       return *this;
     }
 
