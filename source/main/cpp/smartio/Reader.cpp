@@ -12,18 +12,19 @@
 namespace io
 {
 
-Reader::Reader(map_t supply) :
-        suppliers(std::move(supply))
-{
-}
+  Reader::Reader (map_t supply) :
+      suppliers (std::move (supply))
+  {
+  }
 
-Reader::~Reader()
-{
-}
+  Reader::~Reader ()
+  {
+  }
 
-ReadContext Reader::from(input& stream) const
-{
-    return ReadContext(this->suppliers, stream);
-}
+  ReadContext
+  Reader::from (input& stream) const
+  {
+    return ReadContext (this->suppliers, stream);
+  }
 
 } /* namespace io */

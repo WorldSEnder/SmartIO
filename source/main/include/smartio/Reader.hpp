@@ -15,21 +15,22 @@
 namespace io
 {
 
-class Environment;
+  class Environment;
 
-/**
- * A reader actually reads elements from a given file/stream. When created
- * from an Environment all currently registered Suppliers are copied and
- * can therefore be used in the created Reader. The list of Suppliers is
- * final and can not be altered afterwards.<br>
- *
- */
-class Reader
-{
-public:
+  /**
+   * A reader actually reads elements from a given file/stream. When created
+   * from an Environment all currently registered Suppliers are copied and
+   * can therefore be used in the created Reader. The list of Suppliers is
+   * final and can not be altered afterwards.<br>
+   *
+   */
+  class Reader
+  {
+  public:
     using input = ::std::istream;
 
-    virtual ~Reader();
+    virtual
+    ~Reader ();
     /**
      * Gets a reference to a registered supplier for the given type. If none is
      * registered invalid_argument is thrown. The reference's lifetime is as long
@@ -38,11 +39,13 @@ public:
      * <T> the type that should be supplied
      */
     template<typename T>
-    SupplierPtr<T> getSupplier(supplier_key<T> key) const;
+      SupplierPtr<T>
+      getSupplier (supplier_key<T> key) const;
     /**
      * Creates a context that reads from the stream given.
      */
-    ReadContext from(input& stream) const;
+    ReadContext
+    from (input& stream) const;
     /**
      * Reads a new object <T> from the file supplied.
      * If you want to construct multiple objects of the same type rapidly
@@ -57,20 +60,21 @@ public:
      * <T> the type of object to be created
      */
     template<typename T>
-    T construct(input& stream, supplier_key<T> key) const;
-private:
+      T
+      construct (input& stream, supplier_key<T> key) const;
+  private:
     using map_t = _detail::supplier_map;
 
-    Reader();
+    Reader ();
     /**
      * Constructs a new reader from a map of suppliers
      */
-    Reader(map_t map);
+    Reader (map_t map);
 
     friend Environment;
 
     const map_t suppliers;
-};
+  };
 
 } /* namespace io */
 

@@ -15,15 +15,16 @@
 namespace io
 {
 
-using ::std::shared_ptr;
-/**
- * This class serves as a Builder for Readers
- */
-class Environment
-{
-public:
-    Environment();
-    virtual ~Environment();
+  using ::std::shared_ptr;
+  /**
+   * This class serves as a Builder for Readers
+   */
+  class Environment
+  {
+  public:
+    Environment ();
+    virtual
+    ~Environment ();
     /**
      * Adds a supplier to the collection of suppliers used by all Readers
      * built by this Environment. Registering a nullptr has no effect.<br>
@@ -33,7 +34,8 @@ public:
      * \returns A key to retrieve the registered supplier
      */
     template<typename T>
-    supplier_key< T > addSupplier(SupplierPtr< T > ptr);
+      supplier_key<T>
+      addSupplier (SupplierPtr<T> ptr);
     /**
      * Adds a supplier to the collection of suppliers. Registering a nullptr
      * has no effect.<br>
@@ -42,15 +44,17 @@ public:
      *
      */
     template<typename T>
-    auto addSupplier2(shared_ptr< T > ptr)
-    -> supplier_key< base_deduction_t< Supplier, T > >
-    {
-        // FIXME: (currently) can't be put into .tpp -> "member declaration not found"
-        using item_t = base_deduction_t< Supplier, T >;
+      auto
+      addSupplier2 (shared_ptr<T> ptr)
+      -> supplier_key< base_deduction_t< Supplier, T > >
+      {
+	// FIXME: (currently) can't be put into .tpp -> "member declaration not found"
+	using item_t = base_deduction_t< Supplier, T >;
 
-        SupplierPtr<item_t> new_ptr = std::static_pointer_cast< Supplier< item_t >>(ptr);
-        return addSupplier(new_ptr);
-    }
+	SupplierPtr<item_t> new_ptr =
+	    std::static_pointer_cast<Supplier<item_t>> (ptr);
+	return addSupplier (new_ptr);
+      }
     /**
      * Forwards to addSupplier.
      *
@@ -58,16 +62,20 @@ public:
      * <Q> the type to register for
      */
     template<typename T, class ... Args>
-    inline auto emplaceSupplier(Args... args)
-    -> supplier_key< base_deduction_t< Supplier, T > >
-    {
-        using item_t = base_deduction_t< Supplier, T >;
+      inline auto
+      emplaceSupplier (Args ... args)
+      -> supplier_key< base_deduction_t< Supplier, T > >
+      {
+	using item_t = base_deduction_t< Supplier, T >;
 
-        return addSupplier(SupplierPtr< item_t >{ new T{::std::forward<Args>(args)...} });
-    }
+	return addSupplier (SupplierPtr<item_t>
+	  { new T
+	    { ::std::forward<Args>(args)... } });
+      }
 
     template<typename T>
-    SupplierPtr< T > getSupplier(supplier_key< T > key);
+      SupplierPtr<T>
+      getSupplier (supplier_key<T> key);
 
     /**
      * Builds a new Reader from all registered suppliers. The Reader will
@@ -83,12 +91,13 @@ public:
      * may use the returned Reader after this Environment has been destroyed
      * and only if you are sure that all registered Suppliers are alive.
      */
-    Reader build();
+    Reader
+    build ();
 
-private:
+  private:
     using map_t = _detail::supplier_map;
     map_t suppliers;
-};
+  };
 
 } /* namespace io */
 

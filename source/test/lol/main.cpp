@@ -62,7 +62,7 @@ class IndexBlockSupplier : public io::Supplier< indexBlock_t >
     std::unique_ptr<indexBlock_t> supply(io::ReadContext& ctx) const override
     {
         indexBlock_t *target = new indexBlock_t;
-        io::utility::fill_list(target->indices, ctx, ctx[INDEX_NBR_KEY]);
+        io::utility::fill_list(ctx, target->indices, ctx[INDEX_NBR_KEY]);
         return {target};
     }
 };
@@ -94,7 +94,7 @@ class VertexBlockSupplier : public io::Supplier< vertexBlock_t >
     std::unique_ptr<vertexBlock_t> supply(io::ReadContext& ctx) const override
     {
         vertexBlock_t *target = new vertexBlock_t;
-        io::utility::fill_list(target->vertices, ctx, ctx[VERTEX_NBR_KEY]);
+        io::utility::fill_list(ctx, target->vertices, ctx[VERTEX_NBR_KEY]);
         return {target};
     }
 };
@@ -139,8 +139,8 @@ class FileSupplier : public io::Supplier< sknFile_t >
 
             c = (ctx >>= trgt->nbrMats);
         }
-        io::utility::fill_list(trgt->materials, ctx, c);
-        io::utility::fill_list(trgt->objects, ctx, trgt->header.nbrObjects);
+        io::utility::fill_list(ctx, trgt->materials, c);
+        io::utility::fill_list(ctx, trgt->objects, trgt->header.nbrObjects);
         return {trgt};
     }
 };
@@ -169,7 +169,7 @@ int main(void)
     // And read the objects
     try
     {
-        io::ReadContext context = read.with(file);
+        io::ReadContext context = read.from(file);
         sknFile_t sknData = (sknFile_t) context;
         std::cout << sknData.objects.front().vertices.vertices.back().pos[1];
     } catch (std::invalid_argument& e)

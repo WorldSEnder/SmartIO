@@ -10,23 +10,24 @@
 namespace io
 {
 
-fileformatexception::fileformatexception(const char *message) :
-        std::logic_error("Illegal file format"), mess(message)
-{
+  fileformatexception::fileformatexception (const char *message) :
+      std::logic_error ("Illegal file format"), mess (message)
+  {
 
-}
+  }
 
-std::ostringstream fileformatexception::cnvt;
+  std::ostringstream fileformatexception::cnvt;
 
-const char* fileformatexception::what() const throw ()
-{
-    cnvt.str("");
-    cnvt << logic_error::what() << ":" << mess;
-    return cnvt.str().c_str();
-}
+  const char*
+  fileformatexception::what () const throw ()
+  {
+    cnvt.str ("");
+    cnvt << logic_error::what () << ":" << mess;
+    return cnvt.str ().c_str ();
+  }
 
-fileformatexception::~fileformatexception()
-{
-}
+  fileformatexception::~fileformatexception ()
+  {
+  }
 
 } /* namespace io */

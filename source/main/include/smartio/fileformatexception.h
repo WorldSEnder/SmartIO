@@ -11,18 +11,20 @@
 
 namespace io
 {
-/**
- * An appropriate exception to throw if the fileformat is violated
- */
-class fileformatexception : std::logic_error
-{
-private:
+  /**
+   * An appropriate exception to throw if the fileformat is violated
+   */
+  class fileformatexception : std::logic_error
+  {
+  private:
     const char *mess;
     static std::ostringstream cnvt;
-public:
-    fileformatexception(const char *message);
-    virtual ~fileformatexception();
-    virtual const char* what() const throw ();
-};
+  public:
+    fileformatexception (const char *message);
+    virtual
+    ~fileformatexception ();
+    virtual const char*
+    what () const throw ();
+  };
 
 } /* namespace io */

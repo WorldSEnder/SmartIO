@@ -14,8 +14,8 @@ namespace io
 #pragma push_macro("ADDSUPPLIER")
 #define ADDSUPPLIER(type) this->emplaceSupplier< defaultsuppliers::stdsupplier_t< type >>()
 
-Environment::Environment()
-{
+  Environment::Environment ()
+  {
     // integral types
     ADDSUPPLIER(bool);
     ADDSUPPLIER(char);
@@ -37,16 +37,18 @@ Environment::Environment()
     ADDSUPPLIER(unsigned long int);
     ADDSUPPLIER(long long int);
     ADDSUPPLIER(unsigned long long int);
-}
+  }
 
-Environment::~Environment()
-{
-}
+  Environment::~Environment ()
+  {
+  }
 
-Reader Environment::build()
-{
-    return {this->suppliers};
-}
+  Reader
+  Environment::build ()
+  {
+    return
+      { this->suppliers};
+  }
 #pragma pop_macro("ADDSUPPLIER")
 
 } /* namespace io */
