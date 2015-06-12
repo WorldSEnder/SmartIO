@@ -17,15 +17,8 @@ namespace io
     SupplierPtr<T>
     ReadContext::retrieveSupplier (supplier_key<T> key) const
     {
-      return io::getSupplier(this->reference, key);
+      return io::getSupplier (this->reference, key);
     }
-
-  template<typename T>
-    T
-    ReadContext::default_construct()
-  {
-    return T{};
-  }
 
   template<typename T>
     BoundSupplier<T>
@@ -47,11 +40,14 @@ namespace io
     }
   template<typename T>
     T
-    ReadContext::construct (supplier_key<T> key, supplier<T> missing_item)
+    ReadContext::construct (T start, supplier_key<T> key)
     {
+      SupplierPtr<T> s = this->retrieveSupplier (key);
+      if (s != nullptr && s->apply (*this, start))
+	return start;
       T *ptr = this->get<T> (key).release ();
-      if(ptr == nullptr)
-	return missing_item();
+      if (ptr == nullptr)
+	return start;
       return *ptr;
     }
 
@@ -59,7 +55,26 @@ namespace io
     inline ReadContext&
     ReadContext::operator>> (T& out)
     {
-      (*this) >>= out;
+      using cv_item_t = typename ::std::remove_reference<T>::type;
+      using item_t = typename ::std::remove_cv< cv_item_t >::type;
+
+      SupplierPtr<item_t> s = this->retrieveSupplier<item_t> ();
+      if (s == nullptr)
+	{
+	  // FIXME: Overthink when to scream (like here?)
+	  // Reason: No supplier for the object
+	  return *this;
+	}
+      if (!s->apply (*this, out))
+	{
+	  item_t *ptr = this->get<item_t> ().release ();
+	  if (ptr == nullptr)
+	    {
+	      // Or maybe scream here
+	      return *this;
+	    }
+	  out = *ptr;
+	}
       return *this;
     }
 
@@ -67,10 +82,7 @@ namespace io
     inline T&
     ReadContext::operator>>= (T& out)
     {
-      using cv_item_t = typename ::std::remove_reference<T>::type;
-      using item_t = typename ::std::remove_cv< cv_item_t >::type;
-
-      out = this->construct<item_t> ();
+      (*this) >> out;
       return out;
     }
 

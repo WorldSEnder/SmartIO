@@ -5,6 +5,7 @@
  *   Author: Carbon
  */
 #include <istream>
+#include <memory>
 
 #include "smartio/defaultSuppliers.hpp"
 #include "smartio/fileformatexception.h"
@@ -18,23 +19,20 @@ namespace io
       {
       }
 
-    template<typename T>
-      auto
-      stdsupplier_t<T>::dosupply (
-	  ReadContext& context) const -> typename stdsupplier_t<T>::item_t
+    template<typename I>
+      bool
+      stdsupplier_t<I>::doapply (ReadContext& reader, val_t& val) const
       {
 	using ::std::istream;
 
-	istream& is = context.getStream ();
-	this->converter.item = new T;
+	istream& is = reader.getStream ();
+	this->converter.item = std::addressof(val);
 	is.read (*(this->converter.buffer), item_size);
 	if (is.fail ())
 	  throw fileformatexception (
 	      "Unexpected eof. Couldn't fully read std-type");
-	std::unique_ptr<T> item
-	  { this->converter.item };
 	this->converter.item = nullptr;
-	return item;
+	return true;
       }
 
 #pragma push_macro("DEFINESUPPLIER")

@@ -75,13 +75,6 @@ namespace io
     template<typename T, size_t N>
       using arr_ref = T(&)[N];
 
-    template<typename T>
-      static inline T
-      default_construct ();
-
-    template<typename T>
-      using supplier = T (*)();
-
   public:
     using input = ::std::istream;
 
@@ -111,10 +104,14 @@ namespace io
     template<typename T>
       supply_t<T>
       get (supplier_key<T> key = supplier_key<T>::default_ ());
+    /**
+     * Constructs a new value on the stack. This is seperated in three
+     * parts
+     */
     template<typename T>
       T
-      construct (supplier_key<T> key = supplier_key<T>::default_ (),
-		 supplier<T> missing_item = default_construct<T>);
+      construct (T start_val = T{},
+                 supplier_key<T> key = supplier_key<T>::default_ ());
     /**
      * Returns the i-stream this Context is bound to. Altering the stream
      * effectively changes the context thus this method can't be called from

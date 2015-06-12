@@ -15,28 +15,80 @@ namespace io
 // Forward declare Context
   class ReadContext;
 
+  namespace _detail
+  {
+    template<typename T>
+      struct supplier_base_apply
+      {
+	virtual
+	~supplier_base_apply () = default;
+	/**
+	 * Given a readcontext and a (non const) target
+	 * should fill the target with values read from the
+	 * context. If the supplier doesn't support this, it
+	 * should return false. Otherwise the target should
+	 * be changed accordingly and true is returned.
+	 */
+	virtual bool
+	doapply (ReadContext& ctx, T& trgt) const = 0;
+      };
+
+    template<typename T, bool = std::is_default_constructible<T>::value>
+      struct supplier_base_supply : public supplier_base_apply<T>
+      {
+      public:
+	using item_t = supply_t< T >;
+	virtual
+	~supplier_base_supply () = default;
+	/**
+	 * Supplies an item of the type T. This method allocates
+	 * a new T instead of relying on an existant one like #doapply().
+	 *
+	 * If T is default_constructible there exists a default implementation:
+	 * <code>
+	 * T* t = new T{};
+	 * this->doapply(ctx, *t);
+	 * return item_t{ t };
+	 * </code>
+	 */
+	virtual item_t
+	dosupply (ReadContext& ctx) const = 0;
+      };
+
+    template<typename T>
+      struct supplier_base_supply<T, true> : supplier_base_apply<T>
+      {
+      public:
+	using item_t = supply_t< T >;
+	virtual
+	~supplier_base_supply () = default;
+	virtual item_t
+	dosupply (ReadContext& ctx) const
+	{
+	  T* nt = new T; // Default construcible
+	  bool success = this->doapply (ctx, *nt);
+	  (void) success; // Ignore
+	  return item_t
+	    { nt };
+	}
+      };
+  }
+
   /**
    * A supplier for the type T
    */
   template<typename T>
-    class Supplier
+    class Supplier : private _detail::supplier_base_supply<T>
     {
     public:
-      using item_t = supply_t< T >;
+      using item_t = typename _detail::supplier_base_supply<T>::item_t;
 
       virtual
-      ~Supplier ()
-      {
-      }
-
+      ~Supplier () = default;
       item_t
       supply (ReadContext& ctx) const;
-    private:
-      /**
-       * Supplies an item of the type
-       */
-      virtual item_t
-      dosupply (ReadContext&) const = 0;
+      bool
+      apply (ReadContext& ctx, T& trgt) const;
     };
 
   template<typename T>
@@ -83,6 +135,16 @@ namespace io
       supply ()
       {
 	return reference->supply (ctx);
+      }
+      /**
+       * Applies the supplier to an element, if possible
+       * @ret false if this supplier doesn't support application
+       * (e.g. immutable types, UUIDs and what not)
+       */
+      bool
+      apply (T& trgt)
+      {
+	return reference->apply (trgt);
       }
     };
 

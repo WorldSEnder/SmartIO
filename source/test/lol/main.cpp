@@ -59,11 +59,10 @@ typedef struct
 
 class IndexBlockSupplier : public io::Supplier< indexBlock_t >
 {
-    std::unique_ptr<indexBlock_t> dosupply(io::ReadContext& ctx) const override
+    bool doapply(io::ReadContext& ctx, indexBlock_t& target) const override
     {
-        indexBlock_t *target = new indexBlock_t;
-        io::utility::fill_list(ctx, target->indices, ctx[INDEX_NBR_KEY]);
-        return item_t{target};
+        io::utility::fill_list(ctx, target.indices, ctx[INDEX_NBR_KEY]);
+        return true;
     }
 };
 
@@ -91,11 +90,10 @@ typedef struct
 
 class VertexBlockSupplier : public io::Supplier< vertexBlock_t >
 {
-    std::unique_ptr<vertexBlock_t> dosupply(io::ReadContext& ctx) const override
+    bool doapply(io::ReadContext& ctx, vertexBlock_t& target) const
     {
-        vertexBlock_t *target = new vertexBlock_t;
-        io::utility::fill_list(ctx, target->vertices, ctx[VERTEX_NBR_KEY]);
-        return item_t{target};
+      io::utility::fill_list(ctx, target.vertices, ctx[VERTEX_NBR_KEY]);
+      return true;
     }
 };
 
@@ -109,13 +107,12 @@ typedef struct
 
 class ObjectBlockSupplier : public io::Supplier< objectBlock_t >
 {
-    std::unique_ptr<objectBlock_t> dosupply(io::ReadContext& ctx) const override
+    bool doapply(io::ReadContext& ctx, objectBlock_t& trgt) const override
     {
-        objectBlock_t *trgt = new objectBlock_t;
-        ctx[INDEX_NBR_KEY] = (ctx >>= trgt->nbrIndices);
-        ctx[VERTEX_NBR_KEY] = (ctx >>= trgt->nbrVertices);
-        ctx >> trgt->indices >> trgt->vertices;
-        return item_t{trgt};
+        ctx[INDEX_NBR_KEY] = (ctx >>= trgt.nbrIndices);
+        ctx[VERTEX_NBR_KEY] = (ctx >>= trgt.nbrVertices);
+        ctx >> trgt.indices >> trgt.vertices;
+        return true;
     }
 };
 
@@ -129,19 +126,18 @@ typedef struct
 
 class FileSupplier : public io::Supplier< sknFile_t >
 {
-    std::unique_ptr<sknFile_t> dosupply(io::ReadContext& ctx) const override
+    bool doapply(io::ReadContext& ctx, sknFile_t& trgt) const override
     {
-        sknFile_t *trgt = new sknFile_t;
-        ctx >> trgt->header;
+        ctx >> trgt.header;
         uint32_t c = 0;
-        if (trgt->header.matFlag)
+        if (trgt.header.matFlag)
         {
 
-            c = (ctx >>= trgt->nbrMats);
+            c = (ctx >>= trgt.nbrMats);
         }
-        io::utility::fill_list(ctx, trgt->materials, c);
-        io::utility::fill_list(ctx, trgt->objects, trgt->header.nbrObjects);
-        return item_t{trgt};
+        io::utility::fill_list(ctx, trgt.materials, c);
+        io::utility::fill_list(ctx, trgt.objects, trgt.header.nbrObjects);
+        return true;
     }
 };
 

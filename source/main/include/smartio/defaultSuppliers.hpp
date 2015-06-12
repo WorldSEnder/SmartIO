@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "smartio/Supplier.hpp"
 #include "smartio/Context.hpp"
 #include "smartio/detail.hpp"
@@ -19,18 +21,22 @@ namespace io
     template<typename I>
       class stdsupplier_t : public Supplier<I>
       {
-      private:
 	using typename Supplier<I>::item_t;
-	static constexpr std::size_t item_size = sizeof(I);
+	typedef I val_t;
+
+	static constexpr std::size_t item_size = sizeof(val_t);
 	union convert_t
 	{
 	  char (*buffer)[item_size];
-	  I *item;
+	  val_t *item;
 	}mutable converter;
       public:
 	stdsupplier_t (void);
-	item_t
-	dosupply (ReadContext& reader) const override;
+//	Default constructible is a needed for I, for dosupply()
+	static_assert(std::is_default_constructible<I>::value,
+	              "std type not default constructible?!?!?");
+	bool
+	doapply(ReadContext& reader, val_t& type) const override;
       };
 
 #pragma push_macro("DECLSUPPLIER")

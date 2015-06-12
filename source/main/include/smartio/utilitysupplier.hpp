@@ -11,6 +11,7 @@
 #include <utility>
 #include <functional>
 #include <istream>
+#include <memory>
 
 #include "smartio/Supplier.hpp"
 
@@ -87,6 +88,10 @@ namespace io
       template<typename ... Args>
 	using _flatten = typename _flatten_impl<Args...>::type;
 
+    }
+
+    namespace _detail
+    {
       template<typename T, typename List>
 	struct _impl_aggregate;
 // Partial specialization to capture list-args
@@ -101,12 +106,18 @@ namespace io
 	    return construct (ctx);
 	  }
 
+	  bool
+	  doapply (ReadContext& ctx, T& arg) const override
+	  {
+	    // FIXME: optional operation, check for std::copy_contructible();
+	    arg = T{(ctx.construct<Args>())...};
+	    return true;
+	  }
+
 	  static inline item_t
 	  construct (ReadContext& ctx)
 	  {
-	    return item_t
-	      { new T
-		{ (ctx.construct<Args>())... } };
+	    return item_t{ new T{(ctx.construct<Args>())...} };
 	  }
 	};
 
@@ -131,16 +142,31 @@ namespace io
 	  std::istream& stream = ctx.getStream ();
 	  converter.object = new T;
 	  stream.read (converter.buffer, n_size);
-	  return item_t
-	    { converter.object };
+	  item_t ret{ converter.object };
+	  converter.object = nullptr;
+	  return ret;
+	}
+
+	bool
+	doapply(ReadContext& ctx, T& trgt) const override
+	{
+	  std::istream& stream = ctx.getStream ();
+	  converter.object = std::addressof(trgt);
+	  stream.read (converter.buffer, n_size);
+	  converter.object = nullptr;
+	  return true;
 	}
       };
     /**
      * This supplier can be used when the type to be supplied can be
      * brace-initialized.
+     * When a value is to be supplied, this supplier responds with
+     * make_unique(construct<Args>()...);
+     * When a value is to be applied, this supplier responds with
+     * trgt = T{construct<Args>()...};
      */
     template<typename T, typename ... args>
-      using aggregate_supplier = _impl_aggregate<T, _flatten<args...> >;
+      using aggregate_supplier = _detail::_impl_aggregate<T, _flatten<args...> >;
 
 //template<typename T, typename ... Args, Args ... Funcs>
 //struct indirect_supplier : Supplier< T >
