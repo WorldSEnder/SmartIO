@@ -8,6 +8,7 @@
 #pragma once
 
 #include <type_traits>
+#include <string>
 
 #include "smartio/Supplier.hpp"
 #include "smartio/Context.hpp"
@@ -34,11 +35,10 @@ namespace io
 	stdsupplier_t (void);
 //	Default constructible is a needed for I, for dosupply()
 	static_assert(std::is_default_constructible<I>::value,
-	              "std type not default constructible?!?!?");
+	    "std type not default constructible?!?!?");
 	bool
-	doapply(ReadContext& reader, val_t& type) const override;
+	doapply (ReadContext& reader, val_t& type) const override;
       };
-
 #pragma push_macro("DECLSUPPLIER")
 #define DECLKEY(name, type) using name##supplier_t = stdsupplier_t< type >;\
     extern template class stdsupplier_t< type >;
@@ -66,5 +66,31 @@ namespace io
     DECLKEY(ull, unsigned long long int)
 
 #pragma pop_macro("DECLSUPPLIER")
+
+    /**
+//     * Reads a string, that is a sequence of chars with a trailing null-byte
+//     */
+//    class stringsupplier : public Supplier<std::string>
+//    {
+//      using typename Supplier<std::string>::item_t;
+//
+//      bool
+//      doapply (ReadContext& reader, std::string& string) const override;
+//    };
+    /**
+     * Reads a string in the "network-fashion". That is an unsigned
+     * integer followed by that amount of characters forming the string.
+     *
+     * To read the integer context.construct<uint32_t>() is being used,
+     * so you can change the default supplier to the correct endianess.
+     */
+    class netstringsupplier : public Supplier<std::string>
+    {
+      using typename Supplier<std::string>::item_t;
+
+      bool
+      doapply (ReadContext& reader, std::string& string) const override;
+    };
+
   } /* namespace defaultsuppliers */
 } /* namespace io */

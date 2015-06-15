@@ -19,64 +19,55 @@ namespace io
   class WriteContext;
 
   using std::ostream;
-  /**
-   * Base class for suppliers so we can store them in a list
-   */
-  class ConsumerBase
-  {
-  };
+
   /**
    * A supplier for the type T
    */
   template<typename T>
-    class Consumer : public ConsumerBase
+    class Consumer
     {
     public:
+      // Check for valid template arguments
       typedef typename consume_t<T>::type item_t;
 
       virtual
-      ~Consumer ()
-      {
-      }
-      /**
-       * Use this to set environment variables you might need
-       * to communicate to parents
-       */
-      virtual void
-      prepare (const item_t&&) const = 0;
+      ~Consumer ();
       /**
        * Consumes the item given.
        */
+      void
+      consume (WriteContext&, const item_t&) const;
+    private:
       virtual void
-      consume (item_t&&, WriteContext&) const = 0;
+      doconsume (WriteContext&, const item_t&) const = 0;
     };
+
+  template<typename T>
+    using ConsumerPtr = std::shared_ptr<Consumer< T >>;
+
+  template<typename T>
+    using ConstConsumerPtr = std::shared_ptr<const Consumer< T >>;
 
   template<typename T>
     class BoundConsumer
     {
-      const Consumer<T>& reference;
+      typedef typename Consumer<T>::item_t item_t;
+
+      ConstConsumerPtr<T> reference;
       WriteContext& ctx;
     public:
       BoundConsumer () = delete;
-      BoundConsumer (const Consumer<T>& ref, WriteContext& context) :
-	  reference (ref), ctx (context)
-      {
-      }
-      BoundConsumer (Consumer<T> &&, WriteContext&) = delete;
-      typedef typename supply_t<T>::type item_t;
+      BoundConsumer (ConstConsumerPtr<T> ref, WriteContext& context);
 
       virtual
-      ~BoundConsumer ()
-      {
-      }
+      ~BoundConsumer ();
       /**
        * Supplies an item from a previously bound context
        */
       void
-      consume (item_t&& item)
-      {
-	reference.consume (item, ctx);
-      }
+      doconsume (const item_t& item) const override;
     };
 
 } /* namespace io */
+
+#include "smartio/Consumer.tpp"

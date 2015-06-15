@@ -15,4 +15,11 @@ namespace io
       return io::putSupplier(this->suppliers, supplier);
     }
 
+  template<typename T>
+    consumer_key<T>
+    Environment::addConsumer (ConsumerPtr<T> consumer)
+    {
+      return io::putConsumer(this->consumers, consumer);
+    }
+
 }

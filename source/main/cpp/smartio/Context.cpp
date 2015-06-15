@@ -9,29 +9,6 @@
 
 namespace io
 {
-
-  ReadContext::ReadContext (supplier_map reader, input& stream) :
-      reference (std::move (reader)), stream (stream)
-  {
-  }
-
-  ReadContext::~ReadContext ()
-  {
-  }
-
-  auto
-  ReadContext::getStream ()
-  -> input&
-  {
-    return stream;
-  }
-
-  auto
-  ReadContext::getStream () const -> const input&
-  {
-    return stream;
-  }
-
   context_base::context_base () :
       contextVars ()
   {
@@ -67,6 +44,46 @@ namespace io
   context_base::operator[] (key_t key)
   {
     return contextVars[key];
+  }
+
+  ReadContext::ReadContext (supplier_map reader, input& stream) :
+      reference (std::move (reader)), stream (stream)
+  {
+  }
+
+  ReadContext::~ReadContext ()
+  {
+  }
+
+  ReadContext::input&
+  ReadContext::getStream ()
+  {
+    return stream;
+  }
+
+  const ReadContext::input&
+  ReadContext::getStream () const
+  {
+    return stream;
+  }
+
+  WriteContext::WriteContext (consumer_map mappings, output& s)
+    : reference(mappings), stream(s){
+
+  }
+
+  WriteContext::~WriteContext () {}
+
+  WriteContext::output&
+  WriteContext::getStream ()
+  {
+    return stream;
+  }
+
+  const WriteContext::output&
+  WriteContext::getStream () const
+  {
+    return stream;
   }
 
 } /* namespace io */

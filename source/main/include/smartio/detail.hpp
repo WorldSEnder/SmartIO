@@ -15,6 +15,7 @@
 #include <unordered_map>
 
 #include "smartio/Supplier.hpp"
+#include "smartio/Consumer.hpp"
 #include "smartio/typetoken.hpp"
 // Utility include
 #include "smartio/traits.hpp"
@@ -85,22 +86,22 @@ namespace io
     template<typename T>
       inline storage_entry
       toEntry (const SupplierPtr<T>& ptr);
-//    template<typename T>
-//      inline storage_entry
-//      toEntry (const ConsumerPtr<T>& ptr)
-//      {
-//	return std::static_pointer_cast<storage_t> (ptr);
-//      }
+    template<typename T>
+      inline storage_entry
+      toEntry (const ConsumerPtr<T>& ptr)
+      {
+	return std::static_pointer_cast<storage_t> (ptr);
+      }
     /**
      * Reverse of #toEntry().
      * Note: No type-check is performed.
      */
     template<typename T>
-      inline SupplierPtr<T>
+      inline ConstSupplierPtr<T>
       supplierFromEntry (const storage_entry& entry);
-//    template<typename T>
-//      inline ConsumerPtr<T>
-//      consumerFromEntry (const storage_entry& entry);
+    template<typename T>
+      inline ConstConsumerPtr<T>
+      consumerFromEntry (const storage_entry& entry);
 
     /**
      * Retrieves a supplier entry from a map, returns an empty shared_ptr
@@ -137,41 +138,41 @@ namespace io
    * when the entry is not found.
    */
   template<typename T>
-    inline SupplierPtr<T>
+    inline ConstSupplierPtr<T>
     getSupplier (const supplier_map& map, const supplier_key<T>& key)
     {
       return _detail::supplierFromEntry<T> (_detail::getEntry (map, key));
     }
-//  template<typename T>
-//    inline const ConsumerPtr<T>&
-//    getConsumer (const consumer_map& map, const consumer_key<T>& key)
-//    {
-//      return _detail::consumerFromEntry<T> (_detail::getEntry (map, key));
-//    }
+  template<typename T>
+    inline ConstConsumerPtr<T>
+    getConsumer (const consumer_map& map, const consumer_key<T>& key)
+    {
+      return _detail::consumerFromEntry<T> (_detail::getEntry (map, key));
+    }
   template<typename T>
     inline supplier_key<T>
     putSupplier (supplier_map& map, SupplierPtr<T> ptr)
     {
       return _detail::putEntry<T> (map, _detail::toEntry (ptr));
     }
-//  template<typename T>
-//    inline const ConsumerPtr<T>&
-//    putConsumer (consumer_map& map, ConsumerPtr<T> ptr)
-//    {
-//      return _detail::putEntry<T> (map, _detail::toEntry (ptr));
-//    }
+  template<typename T>
+    inline consumer_key<T>
+    putConsumer (consumer_map& map, ConsumerPtr<T> ptr)
+    {
+      return _detail::putEntry<T> (map, _detail::toEntry (ptr));
+    }
   template<typename T>
     inline bool
     makeDefaultSupplier (supplier_map& map, const supplier_key<T>& key)
     {
       return _detail::makeDefaultEntry (map, key);
     }
-//  template<typename T>
-//    inline bool
-//    makeDefaultConsumer (consumer_map& map, const consumer_key<T>& key)
-//    {
-//      return _detail::makeDefaultEntry (map, key);
-//    }
+  template<typename T>
+    inline bool
+    makeDefaultConsumer (consumer_map& map, const consumer_key<T>& key)
+    {
+      return _detail::makeDefaultEntry (map, key);
+    }
 
 }// namespace io
 

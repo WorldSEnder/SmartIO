@@ -9,6 +9,7 @@
 
 #include <unordered_map>
 #include <istream>
+#include <ostream>
 
 #include "smartio/detail.hpp"
 #include "smartio/Supplier.hpp"
@@ -18,6 +19,7 @@ namespace io
 
 // Forward declare for friend
   class Reader;
+  class Writer;
 
   using context_key = size_t;
   using context_val = size_t;
@@ -63,12 +65,10 @@ namespace io
   };
 
   /**
-   * Works as a temporary context for Suppliers and thus is dependent
-   * on a previously created Reader to create objects from. This reader
-   * is kept by reference so the Context's lifetime should be at most as
-   * long as the Reader's.<br>
+   * Works as a temporary context for Suppliers.<br>
+   *
    * The difference to Reader is that also the input stream is already set
-   * and also kept as a reference - introducing another lifetime dependence.
+   * and kept as a reference - introducing another lifetime dependence.
    */
   class ReadContext : public context_base
   {
@@ -111,7 +111,7 @@ namespace io
     template<typename T>
       T
       construct (T start_val = T{},
-                 supplier_key<T> key = supplier_key<T>::default_ ());
+		 supplier_key<T> key = supplier_key<T>::default_ ());
     /**
      * Returns the i-stream this Context is bound to. Altering the stream
      * effectively changes the context thus this method can't be called from
@@ -159,9 +159,56 @@ namespace io
     ReadContext (supplier_map suppliers, input& stream);
     // Helper function to find supplier in map
     template<typename T>
-      SupplierPtr<T>
+      ConstSupplierPtr<T>
       retrieveSupplier (supplier_key<T> key =
 	  supplier_key<T>::default_ ()) const;
+  };
+
+  class WriteContext : public context_base
+  {
+    template<typename T, size_t N>
+      using arr_ref = const T(&)[N];
+
+  public:
+    using output = ::std::ostream;
+
+    virtual
+    ~WriteContext ();
+
+    template<typename T>
+      BoundConsumer<T>
+      getConsumer (consumer_key<T> key = consumer_key<T>::default_ ());
+
+    template<typename T>
+      void
+      write (const T& object, consumer_key<T> key = consumer_key<T>::default_ ());
+
+    output&
+    getStream ();
+
+    const output&
+    getStream () const;
+
+    template<typename T>
+      WriteContext&
+      operator<< (const T& object);
+
+    template<typename T, size_t N>
+      WriteContext&
+      operator<< (arr_ref<T, N> object);
+
+    friend io::Writer;
+  private:
+    const consumer_map reference;
+    output& stream;
+
+    WriteContext () = delete;
+    WriteContext (consumer_map mappings, output& stream);
+
+    template<typename T>
+      ConstConsumerPtr<T>
+      retrieveConsumer (consumer_key<T> key =
+	  consumer_key<T>::default_ ()) const;
   };
 
 } /* namespace io */

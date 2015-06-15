@@ -6,9 +6,11 @@
  */
 #include <istream>
 #include <memory>
+#include <cinttypes>
 
 #include "smartio/defaultSuppliers.hpp"
 #include "smartio/fileformatexception.h"
+#include "smartio/utilitysupplier.hpp"
 
 namespace io
 {
@@ -60,5 +62,16 @@ namespace io
     DEFINESUPPLIER(unsigned long long int)
 
 #pragma pop_macro("DEFINESUPPLIER")
+
+    bool
+    netstringsupplier::doapply(ReadContext& ctx, std::string& str) const
+    {
+      uint32_t size;
+      ctx >> size;
+      char *buffer = new char[size];
+      ctx.getStream().get(buffer, size);
+      str = std::string{buffer, size};
+      return true;
+    }
   } /* namespace defaultsuppliers */
 } /* namespace io */

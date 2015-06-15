@@ -104,7 +104,7 @@ namespace io
       using supplier_t = Supplier< T >;
       using typename supplier_t::item_t;
     private:
-      SupplierPtr<T> reference;
+      ConstSupplierPtr<T> reference;
       ReadContext& ctx;
       BoundSupplier () = delete;
     public:
@@ -114,7 +114,7 @@ namespace io
        * of a BoundSupplier can not exceed the lifetime of the context it is bound
        * to. // FIXME: maybe only allow shared_ptr<Context>'s and enable shared_from_this
        */
-      BoundSupplier (SupplierPtr<T> supplier, ReadContext& context) :
+      BoundSupplier (ConstSupplierPtr<T> supplier, ReadContext& context) :
 	  ctx (context), reference (supplier)
       {
 	if (reference == nullptr)
@@ -122,7 +122,6 @@ namespace io
 	    // FIXME: scream as loud as we can
 	  }
       }
-      BoundSupplier (supplier_t&&, ReadContext&) = delete;
 
       virtual
       ~BoundSupplier ()

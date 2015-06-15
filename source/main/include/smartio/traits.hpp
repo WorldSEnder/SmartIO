@@ -84,17 +84,54 @@ namespace io
 	using type = std::unique_ptr<volatile T>;
       };
 
+    template<typename T, bool = false>
+      struct _consume_impl
+      {
+        typedef T type;
+      };
+
+    template<typename T, bool f>
+      struct _consume_impl<T&, f>
+      {
+	static_assert(f, "Can not use l-value reference as consumed type. Use the unqualified type");
+	using type = T;
+      };
+
+    template<typename T, bool f>
+      struct _consume_impl<T&&, f>
+      {
+	static_assert(f, "Can not use r-value reference as consumed type. Use the unqualified type");
+	using type = T;
+      };
+
+    template<typename T, bool f>
+      struct _consume_impl<T*, f>
+      {
+	static_assert(f, "Writing pointers is non-sense.");
+	using type = T;
+      };
+
+    template<typename T, bool f>
+      struct _consume_impl<volatile T, f>
+      {
+	static_assert(f, "Can not use cv-qualified type as consumed type.");
+	using type = T;
+      };
+
+    template<typename T, bool f>
+      struct _consume_impl<const T, f>
+      {
+	static_assert(f, "Can not use cv-qualified type as consumed type.");
+	using type = T;
+      };
+
   } /** End <anonymous> namespace*/
 
   template<typename T>
     using supply_t = typename _supply_impl<T>::type;
 
   template<typename T, bool = false>
-    struct consume_t
-    {
-      typedef T type;
-      // TODO: more to come, actually consume items
-    };
+    using consume_t = typename _consume_impl<T>::type;
 
   /**
    * Given a templated type Base and a type Q that extends Base<T> for some type

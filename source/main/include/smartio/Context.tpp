@@ -14,7 +14,7 @@ namespace io
   using typetoken::token_t;
 
   template<typename T>
-    SupplierPtr<T>
+    ConstSupplierPtr<T>
     ReadContext::retrieveSupplier (supplier_key<T> key) const
     {
       return io::getSupplier (this->reference, key);
@@ -109,4 +109,45 @@ namespace io
       return *this;
     }
 
+  template<typename T>
+    ConstConsumerPtr<T>
+    WriteContext::retrieveConsumer (consumer_key<T> key) const
+    {
+      return io::getSupplier (this->reference, key);
+    }
+
+  template<typename T>
+    BoundConsumer<T>
+    WriteContext::getConsumer (consumer_key<T> key)
+    {
+      return
+	{ this->retrieveConsumer(key), stream};
+    }
+
+  template<typename T>
+    void
+    WriteContext::write (const T& object, consumer_key<T> key)
+    {
+      ConstConsumerPtr<T> writer = this->retrieveConsumer (key);
+      writer->consume (object);
+    }
+
+  template<typename T>
+    WriteContext&
+    WriteContext::operator<< (const T& object)
+    {
+      this->write (object);
+      return *this;
+    }
+
+  template<typename T, size_t N>
+    WriteContext&
+    WriteContext::operator<< (arr_ref<T, N> in)
+    {
+      for (size_t i = 0; i < N; ++i)
+	{
+	  (*this) << in[i];
+	}
+      return *this;
+    }
 }
