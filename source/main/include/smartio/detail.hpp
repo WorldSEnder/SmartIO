@@ -88,10 +88,7 @@ namespace io
       toEntry (const SupplierPtr<T>& ptr);
     template<typename T>
       inline storage_entry
-      toEntry (const ConsumerPtr<T>& ptr)
-      {
-	return std::static_pointer_cast<storage_t> (ptr);
-      }
+      toEntry (const ConsumerPtr<T>& ptr);
     /**
      * Reverse of #toEntry().
      * Note: No type-check is performed.

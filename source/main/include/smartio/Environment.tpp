@@ -8,18 +8,24 @@
 namespace io
 {
 
+  template<typename Config>
+    Environment::Environment (const Config& c)
+    {
+      c.configure (*this);
+    }
+
   template<typename T>
     supplier_key<T>
     Environment::addSupplier (SupplierPtr<T> supplier)
     {
-      return io::putSupplier(this->suppliers, supplier);
+      return io::putSupplier (this->suppliers, supplier);
     }
 
   template<typename T>
     consumer_key<T>
     Environment::addConsumer (ConsumerPtr<T> consumer)
     {
-      return io::putConsumer(this->consumers, consumer);
+      return io::putConsumer (this->consumers, consumer);
     }
 
 }

@@ -25,6 +25,8 @@ namespace io
   {
   public:
     Environment ();
+    template<typename Config>
+    Environment (const Config& c);
     virtual
     ~Environment ();
     /**

@@ -28,7 +28,7 @@ namespace io
     {
     public:
       // Check for valid template arguments
-      typedef typename consume_t<T>::type item_t;
+      typedef consume_t<T> item_t;
 
       virtual
       ~Consumer ();

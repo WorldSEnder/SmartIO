@@ -14,6 +14,7 @@
 
 #include "smartio/Environment.hpp"
 #include "smartio/Reader.hpp"
+#include "smartio/configurations.hpp"
 
 #include "smartio/utilitysupplier.hpp"
 #include "smartio/fileformatexception.h"
@@ -143,7 +144,7 @@ class FileSupplier : public io::Supplier< sknFile_t >
 
 int main(void)
 {
-    io::Environment env;
+    io::Environment env {io::config::fileworking};
     // Add suppliers
     env.emplaceSupplier< FileSupplier >();
     env.emplaceSupplier< HeaderSupplier >();
@@ -152,7 +153,7 @@ int main(void)
     env.emplaceSupplier< IndexBlockSupplier >();
     env.emplaceSupplier< VertexBlockSupplier >();
     env.emplaceSupplier< VertexSupplier >();
-    io::Reader read = env.build();
+    io::Reader read = env.buildReader ();
     // Open the file
     std::ifstream file(
             R"wpykn(C:\Users\Carbon\Documents\CreativeWorkspace\LoLBearbeitung\data\characters\ahri\skins\base\ahri.skn)wpykn",

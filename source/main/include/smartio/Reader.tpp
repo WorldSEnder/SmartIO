@@ -6,7 +6,7 @@ namespace io
 {
 
   template<typename T>
-    SupplierPtr<T>
+    ConstSupplierPtr<T>
     Reader::getSupplier (supplier_key<T> key) const
     {
       return io::getSupplier (this->suppliers, key);
@@ -16,7 +16,7 @@ namespace io
     T
     Reader::construct (input& stream, supplier_key<T> key) const
     {
-      return from (stream).construct (key);
+      return from (stream).construct (T{}, key);
     }
 
 }

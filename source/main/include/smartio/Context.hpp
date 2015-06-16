@@ -144,11 +144,12 @@ namespace io
       arr_ref<T, N>
       operator>>= (arr_ref<T, N> out);
 
-    friend io::Reader;
+    friend Reader;
   private:
     // Context variables
     const supplier_map reference;
     input& stream;
+
     ReadContext () = delete;
     /**
      * Constructs a Context from a reference to a (non-temporary) map of
@@ -197,7 +198,7 @@ namespace io
       WriteContext&
       operator<< (arr_ref<T, N> object);
 
-    friend io::Writer;
+    friend Writer;
   private:
     const consumer_map reference;
     output& stream;
@@ -212,5 +213,6 @@ namespace io
   };
 
 } /* namespace io */
+// FIXME: include get() and write() as array operations.
 
 #include "Context.tpp"

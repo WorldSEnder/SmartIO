@@ -39,7 +39,7 @@ namespace io
      * <T> the type that should be supplied
      */
     template<typename T>
-      SupplierPtr<T>
+      ConstSupplierPtr<T>
       getSupplier (supplier_key<T> key = supplier_key<T>::default_ ()) const;
     /**
      * Creates a context that reads from the stream given.

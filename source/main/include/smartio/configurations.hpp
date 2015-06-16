@@ -5,6 +5,7 @@
  *****************************************************************/
 
 #pragma once
+#include "smartio/Environment.hpp"
 
 namespace io
 {
@@ -12,32 +13,49 @@ namespace io
   namespace config
   {
 
-    class network_reading_t
+    struct network_reading_t
     {
-      static void
+      void
       configure (Environment& env) const;
     }const network_reading;
 
-    class network_writing_t
+    struct network_writing_t
     {
-      static void
+      void
       configure (Environment& env) const;
     }const network_writing;
 
     /**
      * Registers network readers and writers
      */
-    class networking_t : network_reading_t, network_writing_t
+    struct networking_t : network_reading_t, network_writing_t
     {
-      static void
+      void
       configure (Environment& env) const;
     }const networking;
+
+    /**
+     * File reading registers suppliers working with the native endianess
+     */
+    struct file_reading_t
+    {
+      void
+      configure (Environment& env) const;
+    }const filereading;
+    /**
+     * File writing registers consumers working with the native endianess
+     */
+    struct file_writing_t
+    {
+      void
+      configure (Environment& env) const;
+    }const filewriting;
     /**
      * Registers file readers and writers
      */
-    class fileworking_t
+    struct fileworking_t : public file_reading_t, public file_writing_t
     {
-      static void
+      void
       configure (Environment& env) const;
     }const fileworking;
 

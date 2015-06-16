@@ -12,7 +12,20 @@ namespace io
 {
 
   template<typename T>
-    BoundConsumer<T>::BoundConsumer (ConstConsumerPtr<T> ref, WriteContext& context) :
+    Consumer<T>::~Consumer ()
+    {
+    }
+
+  template<typename T>
+    void
+    Consumer<T>::consume (WriteContext& ctx, const item_t& item) const
+    {
+      this->doconsume (ctx, item);
+    }
+
+  template<typename T>
+    BoundConsumer<T>::BoundConsumer (ConstConsumerPtr<T> ref,
+				     WriteContext& context) :
 	reference (ref), ctx (context)
     {
       if (reference == nullptr)

@@ -6,7 +6,6 @@
  */
 
 #include "smartio/Environment.hpp"
-#include "smartio/defaultSuppliers.hpp"
 #include "smartio/detail.hpp"
 
 namespace io
@@ -20,10 +19,17 @@ namespace io
   }
 
   Reader
-  Environment::build () const
+  Environment::buildReader() const
   {
     return
       { this->suppliers};
+  }
+
+  Writer
+  Environment::buildWriter() const
+  {
+    return
+      { this->consumers};
   }
 
 } /* namespace io */

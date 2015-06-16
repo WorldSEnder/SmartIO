@@ -4,7 +4,6 @@
 
 #include <stdexcept>
 
-#include "smartio/defaultsuppliers.hpp"
 #include "smartio/typetoken.hpp"
 
 namespace io
@@ -32,7 +31,7 @@ namespace io
     supply_t<T>
     ReadContext::get (supplier_key<T> key)
     {
-      SupplierPtr<T> ptr = this->retrieveSupplier<T> (key);
+      ConstSupplierPtr<T> ptr = this->retrieveSupplier<T> (key);
       if (ptr == nullptr)
 	return
 	  { nullptr};
@@ -42,7 +41,7 @@ namespace io
     T
     ReadContext::construct (T start, supplier_key<T> key)
     {
-      SupplierPtr<T> s = this->retrieveSupplier (key);
+      ConstSupplierPtr<T> s = this->retrieveSupplier (key);
       if (s != nullptr && s->apply (*this, start))
 	return start;
       T *ptr = this->get<T> (key).release ();
@@ -58,7 +57,7 @@ namespace io
       using cv_item_t = typename ::std::remove_reference<T>::type;
       using item_t = typename ::std::remove_cv< cv_item_t >::type;
 
-      SupplierPtr<item_t> s = this->retrieveSupplier<item_t> ();
+      ConstSupplierPtr<item_t> s = this->retrieveSupplier<item_t> ();
       if (s == nullptr)
 	{
 	  // FIXME: Overthink when to scream (like here?)
@@ -113,7 +112,7 @@ namespace io
     ConstConsumerPtr<T>
     WriteContext::retrieveConsumer (consumer_key<T> key) const
     {
-      return io::getSupplier (this->reference, key);
+      return io::getConsumer (this->reference, key);
     }
 
   template<typename T>
@@ -129,7 +128,7 @@ namespace io
     WriteContext::write (const T& object, consumer_key<T> key)
     {
       ConstConsumerPtr<T> writer = this->retrieveConsumer (key);
-      writer->consume (object);
+      writer->consume (*this, object);
     }
 
   template<typename T>
