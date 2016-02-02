@@ -33,4 +33,6 @@
 .settings/
 .externalToolBuilders/
 
-
+# gradle artifacts
+.gradle
+build/

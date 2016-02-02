@@ -1,0 +1,57 @@
+import groovy.transform.Memoized;
+
+apply plugin: 'cpp'
+apply plugin: 'cunit'
+
+model {
+  platforms {
+    x64 {
+      architecture "x86_64"
+    }
+    x86 {
+      architecture "x86"
+    }
+  }
+  repositories {
+    libs(PrebuiltLibraries) {
+      cunit {
+        binaries.withType(StaticLibraryBinary) {
+          staticLibraryFile = file("libs/libcunit.dll.a")
+        }
+      }
+    }
+  }
+  components {
+    smartio(NativeLibrarySpec) {
+      targetPlatform "x64"
+      sources {
+        cpp {
+          source {
+            srcDir 'src/smartio/cpp'
+            include '**/*.cpp'
+          }
+          exportedHeaders {
+            srcDir 'src/smartio/headers'
+          }
+        }
+      }
+    }
+  }
+  binaries {
+    all {
+      cppCompiler.args "-std=c++1y"
+    }
+    withType(CUnitTestSuiteBinarySpec) {
+      lib library: "cunit", linkage: 'static'
+    }
+  }
+}
+
+//task getCUnitLocation {
+//    def stdout = new ByteArrayOutputStream()
+//    exec {
+//        commandLine "bash -c 'g++ -m64 -nodefaultlibs -nostartfiles -lcunit -Xlinker -M | grep -oP -e \"(?<=LOAD ).*cunit.*\" | xargs realpath'".tokenize()
+//        standardOutput = stdout
+//    }
+//    
+//}
