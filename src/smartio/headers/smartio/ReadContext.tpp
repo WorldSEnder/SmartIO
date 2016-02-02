@@ -6,8 +6,7 @@
 namespace io {
 
 template<typename T, typename Alloc>
-std::unique_ptr<T> ReadContext::get(supplier_key<T> key,
-		const Alloc& allocator) {
+std::unique_ptr<T> ReadContext::get(supplier_key<T> key, Alloc allocator) {
 	using ptr_t = typename std::allocator_traits<Alloc>::pointer;
 	ConstSupplierSharedPtr < T > supplier = resolveSupplier(key);
 	if (supplier == nullptr) {

@@ -28,8 +28,7 @@ public:
 
 	template<typename T, typename Alloc = std::allocator<T>>
 	std::unique_ptr<T> get(
-			supplier_key<T> key = supplier_key < T > ::default_(),
-			const Alloc& = { });
+			supplier_key<T> key = supplier_key < T > ::default_(), Alloc = { });
 	/**
 	 * Gets a reference to a registered supplier for the given type. If none is
 	 * registered invalid_argument is thrown. The reference's lifetime is as long
